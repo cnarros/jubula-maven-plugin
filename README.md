@@ -30,6 +30,7 @@ Add the following snippet inside build -> plugins:
 
 # Authors
 Alejo Abdala (alejo dot abdala at mulesoft dot org)
+
 Alberto Pose (@thepose)
 
 # License

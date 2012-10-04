@@ -1,0 +1,8 @@
+<component-set>
+    <components>
+        <component>
+            <role>org.codehaus.plexus.archiver.zip.ZipUnArchiver</role>
+            <implementation>org.codehaus.plexus.archiver.zip.ZipUnArchiver</implementation>
+        </component>
+    </components>
+</component-set>

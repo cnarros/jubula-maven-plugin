@@ -29,7 +29,13 @@ Add the following snippet inside build -> plugins:
 ```
 
 # Authors
-Alejo Abdala (alejo dot abdala at mulesoft dot org)
+Alejo Abdala (alejo dot abdala at mulesoft dot com)
+
+Nicolas Avila (nicolas dot avila at mulesoft dot com)
+
+Miguel Oliva (miguel dot oliva at mulesoft dot com)
+
+Damian Pelaez (damian dot pelaez at mulesoft dot com)
 
 Alberto Pose (@thepose)
 

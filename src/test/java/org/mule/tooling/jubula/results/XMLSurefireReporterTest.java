@@ -15,7 +15,16 @@ public class XMLSurefireReporterTest {
 	public void setUp() {
 		reporter = new XMLSurefireReporter(new File("example"));
 		testSuite = new TestSuiteResult("TestSuite Name", "Project Name", 4000L);
-		TestCaseResult testCase = new TestCaseResult("TestCase Name", "TestSuite Name", 3000L, new TestResultSuccessful());
+		
+		TestCaseResult testCase;
+		
+		testCase = new TestCaseResult("TestCase Name1", 3000L, new TestResultSuccessful());
+		testSuite.addTestCaseResult(testCase);
+
+		testCase = new TestCaseResult("TestCase Name2", 3000L, new TestResultError("Out message", "Error message"));
+		testSuite.addTestCaseResult(testCase);
+		
+		testCase = new TestCaseResult("TestCase Name3", 3000L, new TestResultSkipped());
 		testSuite.addTestCaseResult(testCase);
 	}
 	

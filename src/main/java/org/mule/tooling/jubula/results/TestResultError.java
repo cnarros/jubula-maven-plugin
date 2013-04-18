@@ -12,6 +12,11 @@ public class TestResultError extends TestRunResult {
 		this.errorMessage = errorMessage;
 	}
 	
+	public TestResultError(){
+		this.outMessage = "";
+		this.errorMessage = "";
+	}
+	
 	@Override
 	public void reportResult(XMLSurefireReporter reporter, ReportEntry report,
 			Long duration) {

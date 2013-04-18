@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mule.tooling.jubula.JubulaMojo;
+import org.mule.tooling.jubula.OldJubulaMojo;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 @RunWith(JUnit4.class)
 public class JubulaMojoTest extends AbstractMojoTestCase {
 
-    private JubulaMojo jubulaMojo;
+    private OldJubulaMojo jubulaMojo;
     private String product = "org.mule.tooling:my-product:1.0";
     private RepositorySystem repoSystem;
     private RepositorySystemSession repoSession;
@@ -47,7 +47,7 @@ public class JubulaMojoTest extends AbstractMojoTestCase {
 
     @Before
     public void setUp() throws Exception {
-        jubulaMojo = new JubulaMojo();
+        jubulaMojo = new OldJubulaMojo();
         MavenProject project = mock(MavenProject.class);
         repoSession = mock(RepositorySystemSession.class);
         repoSystem = mock(RepositorySystem.class);

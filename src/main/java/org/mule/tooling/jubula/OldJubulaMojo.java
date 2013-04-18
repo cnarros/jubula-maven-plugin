@@ -33,7 +33,7 @@ import java.util.List;
  * @goal test
  * @phase integration-test
  */
-public class JubulaMojo
+public class OldJubulaMojo
         extends AbstractMojo
 {
 

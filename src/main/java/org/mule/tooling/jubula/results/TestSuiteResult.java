@@ -3,6 +3,9 @@ package org.mule.tooling.jubula.results;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.surefire.report.ReportEntry;
+import org.apache.maven.surefire.report.ReporterException;
+
 public class TestSuiteResult {
 
 	private String name;
@@ -57,5 +60,27 @@ public class TestSuiteResult {
 		}
 		this.testCaseResults = testCaseResults;
 	}
-
+	
+	public void addTestCaseResult(TestCaseResult testCase){
+		if (testCaseResults == null) {
+			throw new IllegalStateException();
+		}
+		this.testCaseResults.add(testCase);
+	}
+	
+	public void report(XMLSurefireReporter reporter) throws ReporterException{
+		reporter.reset();
+		reporter.testSetStarting(this.getReportEntry());
+		
+		for(TestCaseResult testCase : testCaseResults){
+			testCase.report(reporter);
+		}
+		
+		reporter.testSetCompleted(this.getReportEntry());
+	}
+	
+	private ReportEntry getReportEntry(){
+		return new ReportEntry("",this.name,this.group,"");
+	}
+	
 }

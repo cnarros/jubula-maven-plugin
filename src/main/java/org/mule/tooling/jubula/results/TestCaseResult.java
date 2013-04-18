@@ -1,5 +1,7 @@
 package org.mule.tooling.jubula.results;
 
+import org.apache.maven.surefire.report.ReportEntry;
+
 public class TestCaseResult {
 	
 	private String name;
@@ -46,6 +48,17 @@ public class TestCaseResult {
 
 	public TestRunResult getTestRunResult() {
 		return testRunResult;
+	}
+
+	public void report(XMLSurefireReporter reporter) {
+		ReportEntry report = this.getReportEntry();
+		
+		reporter.testStarting(report);
+		testRunResult.reportResult(reporter, report, duration);
+	}
+	
+	private ReportEntry getReportEntry(){
+		return new ReportEntry("",this.name,this.group,"");
 	}
 	
 }

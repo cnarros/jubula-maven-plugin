@@ -16,9 +16,7 @@ import java.util.StringTokenizer;
 import org.apache.maven.surefire.report.AbstractReporter;
 import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.ReporterException;
-import org.apache.maven.surefire.util.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.XMLWriter;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 
@@ -72,7 +70,7 @@ public class XMLSurefireReporter extends AbstractReporter {
 
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" + LS);
 
-			Xpp3DomWriter.write((XMLWriter) new PrettyPrintXMLWriter(writer), testSuite);
+			Xpp3DomWriter.write(writer, testSuite);
 		} catch (UnsupportedEncodingException e) {
 			throw new ReporterException("Unable to use UTF-8 encoding", e);
 		} catch (FileNotFoundException e) {

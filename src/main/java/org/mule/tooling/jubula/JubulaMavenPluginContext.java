@@ -10,11 +10,6 @@ public abstract class JubulaMavenPluginContext {
 	public static final String JUBULA_BOOTSTRAP_VERSION = "1.3";
 	public static final String SUREFIRE_RESULTS_DIRECTORY_NAME = "surefire-reports";
 	
-	/**
-	 * Use {@link JubulaMavenPluginContext#pathToJubulaInstallationDirectory()}
-	 */
-	private static final String JUBULA_INSTALLATION_DIRECTORY = "";
-
 	public static File buildDirectory;
 
 	public static String pathToServerPluginsDirectory() {

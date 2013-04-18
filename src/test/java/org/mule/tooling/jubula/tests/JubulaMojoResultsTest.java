@@ -93,4 +93,21 @@ public class JubulaMojoResultsTest extends AbstractMojoTestCase {
 		assertEquals("Create Project via Menu (projectName=loremipsum)", jubulaMojo.getTestName());
 	}
 
+	@Test
+	public void getSuiteNameTest() throws Exception {
+		jubulaMojo.handResults();
+		assertEquals("Sanity Tests", jubulaMojo.getTestSuitName());
+	}
+
+	@Test
+	public void getSuiteResultTest() throws Exception {
+		jubulaMojo.handResults();
+		assertEquals("ERROR", jubulaMojo.getTestSuitResult());
+	}
+
+	@Test
+	public void getSuiteDurationTest() throws Exception {
+		jubulaMojo.handResults();
+		assertEquals("00:04:48", jubulaMojo.getTestSuitDuration());
+	}
 }

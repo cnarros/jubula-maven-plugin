@@ -97,31 +97,32 @@ public class JubulaMojo
      */
     private ZipUnArchiver zipUnArchiver;
 
-    private List<String> pluginsToCopy = Arrays.asList("org.mule.tooling:plugin1:2.1", "org.mule.tooling:plugin2:1.0");
+    private final List<String> pluginsToCopy = Arrays.asList("org.mule.tooling:plugin1:2.1", "org.mule.tooling:plugin2:1.0");
 
-    public void execute()
+    @Override
+	public void execute()
             throws MojoExecutionException
     {
         if ( product == null ) {
             throw new IllegalArgumentException("Product argument cannot be null");
         }
 
-        File jubula = fetchArtifact("org.mule.tooling:org.mule.tooling.studio.product:1.3.1-SNAPSHOT");
-        File jubulaExtractDirectory = new File(workingDirectory, "jubula");
+        final File jubula = fetchArtifact("org.mule.tooling:org.mule.tooling.studio.product:1.3.1-SNAPSHOT");
+        final File jubulaExtractDirectory = new File(workingDirectory, "jubula");
         extract(jubula, jubulaExtractDirectory);
-        File product = fetchArtifact(getProduct());
-        File productFileExtractDir = new File(workingDirectory, "product");
+        final File product = fetchArtifact(getProduct());
+        final File productFileExtractDir = new File(workingDirectory, "product");
         File productDirectory = null;
         extract(product, productFileExtractDir);
 
-        File[] files = productFileExtractDir.listFiles();
+        final File[] files = productFileExtractDir.listFiles();
 
         if ( files == null ) {
             throw new IllegalArgumentException("Problem occurred while listing: " + productFileExtractDir);
         }
 
         //unhack me!
-        for (File file : files) {
+        for (final File file : files) {
             if ( file.isDirectory() ) {
                 productDirectory = file;
             }
@@ -132,26 +133,26 @@ public class JubulaMojo
         }
 
         try {
-            for (String s : pluginsToCopy) {
+            for (final String s : pluginsToCopy) {
                 FileUtils.copyFileToDirectory(fetchArtifact(s), new File(productDirectory, "plugins"));
             }
 
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MojoExecutionException(e.getMessage(),e);
         }
 
         try {
-            String[] autRunWithParams = Arrays.asList(new File(jubulaExtractDirectory, "server/autrun.exe").getAbsolutePath(), "-rcp").toArray(new String[0]);
+            final String[] autRunWithParams = Arrays.asList(new File(jubulaExtractDirectory, "server/autrun.exe").getAbsolutePath(), "-rcp").toArray(new String[0]);
             Runtime.getRuntime().exec(new File(jubulaExtractDirectory, "server/autagent.exe").getAbsolutePath());
             Runtime.getRuntime().exec(autRunWithParams);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new MojoExecutionException(e.getMessage(),e);
         }
 
     }
 
-    public File fetchArtifact(String mavenCoordinates) throws MojoExecutionException {
-        ArtifactRequest request = new ArtifactRequest();
+    public File fetchArtifact(final String mavenCoordinates) throws MojoExecutionException {
+        final ArtifactRequest request = new ArtifactRequest();
         request.setArtifact(
                 new DefaultArtifact( mavenCoordinates ) );
         request.setRepositories( remoteRepos );
@@ -163,11 +164,11 @@ public class JubulaMojo
         try
         {
             result = repoSystem.resolveArtifact( repoSession, request );
-        } catch ( ArtifactResolutionException e ) {
+        } catch ( final ArtifactResolutionException e ) {
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
-        Artifact artifact = result.getArtifact();
+        final Artifact artifact = result.getArtifact();
 
         getLog().info( "Resolved artifact " + artifact + " to " +
                 result.getArtifact().getFile() + " from "
@@ -176,9 +177,9 @@ public class JubulaMojo
         return artifact.getFile();
     }
 
-    public void extract(File file, File extractDirectory) {
+    public void extract(final File file, final File extractDirectory) {
         extractDirectory.mkdirs();
-        ZipUnArchiver zipUnArchiver = new ZipUnArchiver(file);
+        final ZipUnArchiver zipUnArchiver = new ZipUnArchiver(file);
         zipUnArchiver.setDestDirectory(extractDirectory);
         zipUnArchiver.extract();
     }

@@ -1,5 +1,6 @@
 package org.mule.tooling.jubula;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,16 @@ import org.dom4j.io.SAXReader;
  * @phase post-integration-test
  */
 public class JubulaResultsMojo extends AbstractMojo {
+
+	/**
+	 * Where the .js files will be located for running.
+	 * 
+	 * @parameter expression="${project.build.directory}"
+	 * @readonly
+	 * @required
+	 */
+	private File buildDirectory;
+	
 	private String archiveSource = getClass().getClassLoader().getResource("executionLog.xml").getFile();
 	private Document handlerDocument;
 	private static Map<String, String> mapOfResult;
@@ -41,7 +52,8 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// TODO Auto-generated method stub
+		String jubulaResultsFolder = buildDirectory + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
+		String surefireResultsFolder = buildDirectory + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
 
 	}
 

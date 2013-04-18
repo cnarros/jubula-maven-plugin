@@ -2,6 +2,7 @@ package org.mule.tooling.jubula;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -34,14 +35,6 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	 * @required
 	 */
 	private MavenProject project;
-
-	/**
-	 * Where the resulting css files must be saved.
-	 * 
-	 * @parameter expression="${jubula.product}"
-	 * @required
-	 */
-	private String product;
 
 	/**
 	 * The entry point to Aether, i.e. the component doing all the work.
@@ -77,6 +70,23 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	private File workingDirectory;
 
 	/**
+	 * RCP target directory.
+	 * 
+	 * @parameter expression="${myRcp}" default-value="asdf"
+	 * @required
+	 */
+	private String rcpTargetDirectory;
+
+	/**
+	 * Where the .js files will be located for running.
+	 * 
+	 * @parameter expression="${project.build.directory}/jubula"
+	 * @readonly
+	 * @required
+	 */
+	private final List<String> pluginsToCopy = Arrays.asList();
+
+	/**
 	 * ZipUnArchiver
 	 * 
 	 * @component
@@ -85,67 +95,88 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// <execution>
-		// <id>copy-jubula-plugins</id>
-		// <phase>initialize</phase>
-		// <configuration>
-		// <target>
-		// <copy
-		// todir="target/jubula-bootstrap-${jubula.version}/jubula/plugins">
-		// <fileset
-		// dir="target/jubula-bootstrap-${jubula.version}/server/plugins">
-		// <include name="**/*.*"/>
-		// </fileset>
-		// </copy>
-		// </target>
-		// </configuration>
-		// <goals>
-		// <goal>run</goal>
-		// </goals>
-		// </execution>
+		// Create directories for testing
+		// <mkdir dir="target/studioworkspace"/>
+		// <mkdir dir="target/results"/>
 
-		if (product == null) {
-			throw new IllegalArgumentException(
-					"Product argument cannot be null");
-		}
+		// if (product == null) {
+		// throw new IllegalArgumentException(
+		// "Product argument cannot be null");
+		// }
+		//
+		// final File jubula =
+		// fetchArtifact("org.mule.tooling:org.mule.tooling.studio.product:1.3.1-SNAPSHOT");
+		// final File jubulaExtractDirectory = new File(workingDirectory,
+		// "jubula");
+		// extract(jubula, jubulaExtractDirectory);
+		// final File product = fetchArtifact(getProduct());
+		// final File productFileExtractDir = new File(workingDirectory,
+		// "product");
+		// File productDirectory = null;
+		// extract(product, productFileExtractDir);
+		//
+		// final File[] files = productFileExtractDir.listFiles();
+		//
+		// if (files == null) {
+		// throw new IllegalArgumentException(
+		// "Problem occurred while listing: " + productFileExtractDir);
+		// }
+		//
+		// // unhack me!
+		// for (final File file : files) {
+		// if (file.isDirectory()) {
+		// productDirectory = file;
+		// }
+		// }
+		//
+		// if (productDirectory == null) {
+		// throw new MojoExecutionException(
+		// "Directory not found in extracted directory.");
+		// }
+		//
+		// try {
+		// for (final String s : pluginsToCopy) {
+		// FileUtils.copyFileToDirectory(fetchArtifact(s), new File(
+		// productDirectory, "plugins"));
+		// }
+		//
+		// } catch (final IOException e) {
+		// throw new MojoExecutionException(e.getMessage(), e);
+		// }
 
-		final File jubula = fetchArtifact("org.mule.tooling:org.mule.tooling.studio.product:1.3.1-SNAPSHOT");
-		final File jubulaExtractDirectory = new File(workingDirectory, "jubula");
-		extract(jubula, jubulaExtractDirectory);
-		final File product = fetchArtifact(getProduct());
-		final File productFileExtractDir = new File(workingDirectory, "product");
-		File productDirectory = null;
-		extract(product, productFileExtractDir);
-
-		final File[] files = productFileExtractDir.listFiles();
-
-		if (files == null) {
-			throw new IllegalArgumentException(
-					"Problem occurred while listing: " + productFileExtractDir);
-		}
-
-		// unhack me!
-		for (final File file : files) {
-			if (file.isDirectory()) {
-				productDirectory = file;
-			}
-		}
-
-		if (productDirectory == null) {
-			throw new MojoExecutionException(
-					"Directory not found in extracted directory.");
-		}
+		getLog().info("Hello Maven Hackaton!");
 
 		try {
-			for (final String s : pluginsToCopy) {
-				FileUtils.copyFileToDirectory(fetchArtifact(s), new File(
-						productDirectory, "plugins"));
-			}
-
+			copyServerJubulaPluginsToJubulaPlugins();
+			copyRemoteControlToApp();
 		} catch (final IOException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
+			throw new MojoExecutionException(
+					"Error copying plugins. Verify that the RCP target directory is correct.",
+					e);
 		}
+	}
 
+	private void copyServerJubulaPluginsToJubulaPlugins() throws IOException {
+		FileUtils
+				.copyDirectory(
+						new File(
+								"target/jubula-bootstrap-${jubula.version}/server/plugins"), //
+						new File(
+								"target/jubula-bootstrap-${jubula.version}/jubula/plugins"));
+	}
+
+	private void copyRemoteControlToApp() throws IOException {
+		// Copy plugins to RCP plugins directory
+		// <copy todir="target/MuleStudio/plugins">
+		// 		<fileset dir="${resources.path}/plugins">
+		// 			<include name="**/*.jar"/>
+		// 		</fileset>
+		// </copy>
+		FileUtils
+				.copyDirectory( //
+						new File(
+								"target/jubula-bootstrap-${jubula.version}/jubula/plugins"), //
+						new File(rcpTargetDirectory));
 	}
 
 	public File fetchArtifact(final String mavenCoordinates)
@@ -180,10 +211,6 @@ public class JubulaPrepareMojo extends AbstractMojo {
 		final ZipUnArchiver zipUnArchiver = new ZipUnArchiver(file);
 		zipUnArchiver.setDestDirectory(extractDirectory);
 		zipUnArchiver.extract();
-	}
-
-	public String getProduct() {
-		return product;
 	}
 
 }

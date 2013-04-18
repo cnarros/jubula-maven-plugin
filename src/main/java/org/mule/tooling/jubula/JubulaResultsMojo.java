@@ -65,7 +65,7 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 			while (sequence < listOfTestsResults.size()) {
 
-				TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), 0L, new TestResultSuccessful());
+				TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), getTestTestDurationById(sequence), new TestResultSuccessful());
 				testSuite.addTestCaseResult(testCase);
 				sequence++;
 
@@ -137,6 +137,21 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 	public long getTestSuitDuration() {
 		Node node = getHandlerDocument().selectSingleNode("//test-length");
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+		Date date;
+		try {
+			date = sdf.parse(node.getStringValue());
+			return date.getTime();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0;
+		}
+
+	}
+
+	public long getTestTestDurationById(int secuencialID) {
+		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/@duration");
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
 		Date date;
 		try {

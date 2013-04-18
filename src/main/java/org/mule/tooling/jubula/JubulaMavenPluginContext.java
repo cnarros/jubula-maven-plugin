@@ -8,7 +8,8 @@ public abstract class JubulaMavenPluginContext {
 	public static final String RCPWORKSPACE_DIRECTORY_NAME = "rcpworkspace";
 	public static final String RESULTS_DIRECTORY_NAME = "results";
 	public static final String JUBULA_BOOTSTRAP_VERSION = "1.3";
-
+	public static final String SUREFIRE_RESULTS_DIRECTORY_NAME = "surefire-reports";
+	
 	/**
 	 * Use {@link JubulaMavenPluginContext#pathToJubulaInstallationDirectory()}
 	 */

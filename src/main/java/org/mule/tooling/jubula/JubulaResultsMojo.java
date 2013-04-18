@@ -1,5 +1,6 @@
 package org.mule.tooling.jubula;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +27,16 @@ import org.mule.tooling.jubula.results.XMLSurefireGenerator;
  * @phase post-integration-test
  */
 public class JubulaResultsMojo extends AbstractMojo {
+
+	/**
+	 * Where the .js files will be located for running.
+	 * 
+	 * @parameter expression="${project.build.directory}"
+	 * @readonly
+	 * @required
+	 */
+	private File buildDirectory;
+	
 	private String archiveSource = getClass().getClassLoader().getResource("executionLog.xml").getFile();
 	private Document handlerDocument;
 	private static Map<String, String> mapOfResult;
@@ -48,6 +59,9 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+
+		String jubulaResultsFolder = buildDirectory + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
+		String surefireResultsFolder = buildDirectory + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
 		XMLSurefireGenerator generator;
 		TestSuiteResult testSuite;
 
@@ -81,7 +95,6 @@ public class JubulaResultsMojo extends AbstractMojo {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	public void handResults() throws DocumentException {

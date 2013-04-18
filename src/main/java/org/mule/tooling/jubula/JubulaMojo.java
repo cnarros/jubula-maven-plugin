@@ -31,7 +31,7 @@ import java.util.List;
  * Goal that runs Jubula Functional Tests.
  *
  * @goal test
- * @phase test
+ * @phase integration-test
  */
 public class JubulaMojo
         extends AbstractMojo

@@ -21,5 +21,5 @@ public abstract class JubulaCliExecutor {
 			String autAgentPort, Callback callback);
 
 	public abstract boolean runTests(String projectName, String projectVersion, String autId, String databaseUrl, String databaseUser, String databasePassword,
-			String autAgentHost, String autAgentPort, String language, String testJob, String datadir, String minusData, String resultsDir);
+			String autAgentHost, String autAgentPort, String language, String testJob, String datadir, String resultsDir);
 }

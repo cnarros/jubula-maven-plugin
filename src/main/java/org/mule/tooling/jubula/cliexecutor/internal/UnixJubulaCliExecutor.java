@@ -20,7 +20,7 @@ public class UnixJubulaCliExecutor extends JubulaCliExecutor {
 
 	@Override
 	public boolean runTests(String projectName, String projectVersion, String autId, String databaseUrl, String databaseUser, String databasePassword, String autAgentHost,
-			String autAgentPort, String language, String testJob, String datadir, String minusData, String resultsDir) {
+			String autAgentPort, String language, String testJob, String datadir, String resultsDir) {
 		// TODO Auto-generated method stub
 		return false;
 	}

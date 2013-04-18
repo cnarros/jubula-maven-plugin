@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -25,6 +26,7 @@ import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 public class XMLSurefireReporter extends AbstractReporter {
 
 	private static final String LS = System.getProperty("line.separator");
+	private static final Double MILLIS_PER_SECOND = 1000d;
 
 	private File reportsDirectory;
 
@@ -294,5 +296,11 @@ public class XMLSurefireReporter extends AbstractReporter {
 	@Override
 	public void writeMessage(String message) {
 	}
+
+	protected String elapsedTimeAsString( long runTime )
+    {
+		Double seconds = runTime / MILLIS_PER_SECOND;
+        return String.format(Locale.ENGLISH, "%f", seconds);
+    }
 
 }

@@ -1,10 +1,9 @@
-package org.mule.tooling.jubula.cliexecutor.internal;
+package org.mule.tooling.jubula.cliexecutor;
 
 import java.util.concurrent.Semaphore;
 
-import org.mule.tooling.jubula.cliexecutor.Callback;
 
-final class SyncCallback implements Callback {
+public class SyncCallback implements Callback {
 	private int result;
 	private Semaphore semaphore = new Semaphore(0);
 

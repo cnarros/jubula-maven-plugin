@@ -22,7 +22,8 @@ public class WindowsJubulaCliExecutor extends JubulaCliExecutor {
 	@Override
 	public void startAutAgent(Callback callback) {
 		CliExecutor cliExecutor = getCliExecutor();
-		File startAutAgentFile = new File(jubulaInstallationPath, START_AUT_AGENT_FILENAME);
+		File serverFolder = new File(jubulaInstallationPath, SERVER_FOLDER);
+		File startAutAgentFile = new File(serverFolder, START_AUT_AGENT_FILENAME);
 		cliExecutor.runAsync(startAutAgentFile, callback, new String[] {});
 	}
 

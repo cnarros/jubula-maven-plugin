@@ -1,6 +1,9 @@
 package org.mule.tooling.jubula;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +15,10 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.mule.tooling.jubula.results.TestCaseResult;
+import org.mule.tooling.jubula.results.TestResultSuccessful;
+import org.mule.tooling.jubula.results.TestSuiteResult;
+import org.mule.tooling.jubula.results.XMLSurefireGenerator;
 
 /**
  * Goal that runs Jubula Functional Tests.
@@ -52,9 +59,42 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+
 		String jubulaResultsFolder = buildDirectory + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
 		String surefireResultsFolder = buildDirectory + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
+		XMLSurefireGenerator generator;
+		TestSuiteResult testSuite;
 
+		try {
+			handResults();
+			String suitName = getTestSuitName();
+			List<Node> listOfTestsResults = getListOfResults();
+			// Create the output folder
+			generator = new XMLSurefireGenerator("nicolasFolder");
+
+			// Create the output folder
+			testSuite = new TestSuiteResult(suitName, getProjectName(), getTestSuitDuration());
+			int sequence = 0;
+			System.out.println("size:" + listOfTestsResults.size());
+
+			while (sequence < listOfTestsResults.size()) {
+
+				TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), 0L, new TestResultSuccessful());
+				testSuite.addTestCaseResult(testCase);
+				sequence++;
+
+				System.out.println("result number:" + sequence);
+			}
+
+			generator.generateXML(testSuite);
+
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void handResults() throws DocumentException {
@@ -68,16 +108,11 @@ public class JubulaResultsMojo extends AbstractMojo {
 		return document;
 	}
 
-	private void forExample(Document document) {
-		// using Xpath
-		List list = document.selectNodes("//foo/bar");
+	public List<Node> getListOfResults() {
 
-		Node node = document.selectSingleNode("//foo/bar/author");
-
-		node.getStringValue();
-
-		String name = node.valueOf("@name");
-
+		@SuppressWarnings("unchecked")
+		List<Node> nodes = getHandlerDocument().selectNodes("//testsuite/test-run/testcase");
+		return nodes;
 	}
 
 	public String getTestName() {
@@ -87,8 +122,24 @@ public class JubulaResultsMojo extends AbstractMojo {
 		return node.getStringValue() + " (projectName=" + nodeAtribute.getStringValue() + ")";
 	}
 
+	public String getTestNameByID(int secuencialID) {
+		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/name");
+		Node nodeAtribute = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/parameter/parameter-value");
+
+		if (nodeAtribute == null) {
+			return "Not Provided";
+		}
+
+		return node.getStringValue() + " (projectName=" + nodeAtribute.getStringValue() + ")";
+	}
+
 	public String getTestSuitName() {
 		Node node = getHandlerDocument().selectSingleNode("//testsuite/name");
+		return node.getStringValue();
+	}
+
+	public String getProjectName() {
+		Node node = getHandlerDocument().selectSingleNode("//project/name");
 		return node.getStringValue();
 	}
 
@@ -97,9 +148,19 @@ public class JubulaResultsMojo extends AbstractMojo {
 		return mapOfResult.get(node.getStringValue());
 	}
 
-	public String getTestSuitDuration() {
+	public long getTestSuitDuration() {
 		Node node = getHandlerDocument().selectSingleNode("//test-length");
-		return node.getStringValue();
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+		Date date;
+		try {
+			date = sdf.parse(node.getStringValue());
+			return date.getTime();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return 0;
+		}
+
 	}
 
 	public Document getHandlerDocument() {

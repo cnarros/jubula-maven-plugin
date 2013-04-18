@@ -108,6 +108,36 @@ public class JubulaMojoResultsTest extends AbstractMojoTestCase {
 	@Test
 	public void getSuiteDurationTest() throws Exception {
 		jubulaMojo.handResults();
-		assertEquals("00:04:48", jubulaMojo.getTestSuitDuration());
+		assertEquals(11088000, jubulaMojo.getTestSuitDuration());
+	}
+
+	@Test
+	public void getSuiteDurationEmptyTest() throws Exception {
+		jubulaMojo.handResults();
+		assertEquals(11088000, jubulaMojo.getTestSuitDuration());
+	}
+
+	@Test
+	public void getResultByNumberTest() throws Exception {
+		jubulaMojo.handResults();
+
+		assertEquals("Create Project via Menu (projectName=loremipsum)", jubulaMojo.getTestNameByID(1));
+
+		assertEquals("Create Templates (projectName=hello-world)", jubulaMojo.getTestNameByID(4));
+
+		assertEquals("Not Provided", jubulaMojo.getTestNameByID(6));
+	}
+
+	@Test
+	public void getResultWithErrorTest() throws Exception {
+		jubulaMojo.handResults();
+
+		assertEquals("Not Provided", jubulaMojo.getTestNameByID(2));
+
+	}
+
+	@Test
+	public void funtionalTest() throws Exception {
+		jubulaMojo.execute();
 	}
 }

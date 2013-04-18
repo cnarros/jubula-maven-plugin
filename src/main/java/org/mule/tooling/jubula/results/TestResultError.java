@@ -13,8 +13,8 @@ public class TestResultError extends TestRunResult {
 	}
 	
 	public TestResultError(){
-		this.outMessage = "";
-		this.errorMessage = "";
+		this.outMessage = "Undefined Error";
+		this.errorMessage = this.outMessage;
 	}
 	
 	@Override

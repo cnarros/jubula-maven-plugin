@@ -21,7 +21,7 @@ public class XMLSurefireReporterTest {
 		testCase = new TestCaseResult("TestCase Name1", 3000L, new TestResultSuccessful());
 		testSuite.addTestCaseResult(testCase);
 
-		testCase = new TestCaseResult("TestCase Name2", 3000L, new TestResultError("Out message", "Error message"));
+		testCase = new TestCaseResult("TestCase Name2", 3000L, new TestResultError());
 		testSuite.addTestCaseResult(testCase);
 		
 		testCase = new TestCaseResult("TestCase Name3", 3000L, new TestResultSkipped());
@@ -31,6 +31,7 @@ public class XMLSurefireReporterTest {
 	@Test
 	public void testReporter() throws ReporterException {
 		testSuite.report(reporter);
+		
 	}
 
 }

@@ -253,8 +253,6 @@ public class XMLSurefireReporter extends AbstractReporter {
 
 	@Override
 	public void writeMessage(String message) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

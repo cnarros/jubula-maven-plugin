@@ -17,15 +17,15 @@ public class XMLSurefireGenerator {
 		this.reporter = new XMLSurefireReporter(new File(folder));
 	}
 	
-	public void generateXML(TestSuiteResult suite){
+	public void generateXML(TestSuiteResult suite) throws XMLSurefireGeneratorException{
 		try {
 			suite.report(reporter);
 		} catch (ReporterException e) {
-			e.printStackTrace();
+			throw new XMLSurefireGeneratorException("XML Surefire generation failed", e);
 		}
 	}
 	
-	public void generateXML(List<TestSuiteResult> suites){
+	public void generateXML(List<TestSuiteResult> suites) throws XMLSurefireGeneratorException{
 		for(TestSuiteResult suite : suites){
 			this.generateXML(suite);			
 		}

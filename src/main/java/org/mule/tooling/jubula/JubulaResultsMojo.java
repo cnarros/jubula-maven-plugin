@@ -36,7 +36,7 @@ public class JubulaResultsMojo extends AbstractMojo {
 	 * @required
 	 */
 	private File buildDirectory;
-	
+
 	private String archiveSource = getClass().getClassLoader().getResource("executionLog.xml").getFile();
 	private Document handlerDocument;
 	private static Map<String, String> mapOfResult;
@@ -70,7 +70,7 @@ public class JubulaResultsMojo extends AbstractMojo {
 			String suitName = getTestSuitName();
 			List<Node> listOfTestsResults = getListOfResults();
 			// Create the output folder
-			generator = new XMLSurefireGenerator("nicolasFolder");
+			generator = new XMLSurefireGenerator("surefireResultsFolder");
 
 			// Create the output folder
 			testSuite = new TestSuiteResult(suitName, getProjectName(), getTestSuitDuration());

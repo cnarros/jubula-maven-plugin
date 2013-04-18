@@ -1,5 +1,3 @@
-### This project is currently inactive (and not in a usable state). We promise to resume progress on it sometime :)
-
 # jubula-maven-plugin
 Run [Jubula Functional Tests](http://www.eclipse.org/jubula/) in a Maven build. Beware: This project is under heavy development and may be broken from time to time.
 

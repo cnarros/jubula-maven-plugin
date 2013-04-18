@@ -7,7 +7,7 @@ public class TestResultSuccessful extends TestRunResult {
 	@Override
 	public void reportResult(XMLSurefireReporter reporter, ReportEntry report,
 			Long duration) {
-		reporter.testSucceeded(report);
+		reporter.testSucceeded(report, duration);
 	}
 
 }

@@ -62,9 +62,15 @@ public class TestSuiteResult {
 	}
 	
 	public void addTestCaseResult(TestCaseResult testCase){
+		if(testCase == null){
+			throw new IllegalArgumentException();
+		}
+		
 		if (testCaseResults == null) {
 			throw new IllegalStateException();
 		}
+		
+		testCase.setGroup(this.name);
 		this.testCaseResults.add(testCase);
 	}
 	
@@ -76,7 +82,7 @@ public class TestSuiteResult {
 			testCase.report(reporter);
 		}
 		
-		reporter.testSetCompleted(this.getReportEntry());
+		reporter.testSetCompleted(this.getReportEntry(), duration);
 	}
 	
 	private ReportEntry getReportEntry(){

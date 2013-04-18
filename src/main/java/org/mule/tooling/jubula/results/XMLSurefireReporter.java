@@ -33,11 +33,21 @@ public class XMLSurefireReporter extends AbstractReporter {
 
 		this.reportsDirectory = reportsDirectory;
 	}
-
+	
 	public void testSetCompleted(ReportEntry report) throws ReporterException {
-		super.testSetCompleted(report);
+		this.testSetCompleted(report, null);
+	}
 
-		long runTime = System.currentTimeMillis() - testSetStartTime;
+	public void testSetCompleted(ReportEntry report, Long duration) throws ReporterException {
+		super.testSetCompleted(report);
+		
+		long runTime;
+		
+		if(duration == null){
+			runTime = System.currentTimeMillis() - testSetStartTime;
+		} else {
+			runTime = duration;
+		}
 
 		Xpp3Dom testSuite = createTestSuiteElement(report, runTime);
 
@@ -96,9 +106,19 @@ public class XMLSurefireReporter extends AbstractReporter {
 	}
 
 	public void testSucceeded(ReportEntry report) {
+		this.testSucceeded(report, null);
+	}
+	
+	public void testSucceeded(ReportEntry report, Long duration) {
 		super.testSucceeded(report);
-
-		long runTime = this.endTime - this.startTime;
+		
+		long runTime;
+		
+		if(duration == null){
+			runTime = this.endTime - this.startTime;
+		} else {
+			runTime = duration;
+		}
 
 		Xpp3Dom testCase = createTestElement(report, runTime);
 
@@ -129,25 +149,44 @@ public class XMLSurefireReporter extends AbstractReporter {
 	}
 
 	public void testError(ReportEntry report, String stdOut, String stdErr) {
+		this.testError(report, stdOut, stdErr, null);
+	}
+	
+	public void testError(ReportEntry report, String stdOut, String stdErr, Long duration) {
 		super.testError(report, stdOut, stdErr);
 
-		writeTestProblems(report, stdOut, stdErr, "error");
+		writeTestProblems(report, stdOut, stdErr, "error", duration);
 	}
 
 	public void testFailed(ReportEntry report, String stdOut, String stdErr) {
+		this.testFailed(report, stdOut, stdErr, null);
+	}
+	
+	public void testFailed(ReportEntry report, String stdOut, String stdErr, Long duration) {
 		super.testFailed(report, stdOut, stdErr);
 
-		writeTestProblems(report, stdOut, stdErr, "failure");
+		writeTestProblems(report, stdOut, stdErr, "failure", duration);
 	}
 
 	public void testSkipped(ReportEntry report) {
+		this.testSkipped(report, null);
+	}
+	
+	public void testSkipped(ReportEntry report, Long duration) {
 		super.testSkipped(report);
-		writeTestProblems(report, null, null, "skipped");
+		writeTestProblems(report, null, null, "skipped", duration);
 	}
 
 	private void writeTestProblems(ReportEntry report, String stdOut,
-			String stdErr, String name) {
-		long runTime = endTime - startTime;
+			String stdErr, String name, Long duration) {
+		
+		long runTime;
+		
+		if(duration == null){
+			runTime = this.endTime - this.startTime;
+		} else {
+			runTime = duration;
+		}
 
 		Xpp3Dom testCase = createTestElement(report, runTime);
 

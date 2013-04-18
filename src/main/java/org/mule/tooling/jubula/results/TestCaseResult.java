@@ -15,19 +15,33 @@ public class TestCaseResult {
 	private TestRunResult testRunResult;
 
 	public TestCaseResult(String name, String group, String className, Long duration, TestRunResult testRunResult) {
-		if (name == null || group == null || duration == null || testRunResult == null) {
+		if (name == null || duration == null || testRunResult == null) {
 			throw new IllegalArgumentException();
 		}
 
 		this.name = name;
-		this.className = className;
- 		this.group = group;
 		this.duration = duration;
 		this.testRunResult = testRunResult;
+		
+		if(className == null){
+			this.className = "";
+		} else {
+			this.className = className;
+		}
+		
+		if(group == null){
+			this.group = "";
+		} else {
+			this.group = group;
+		}
 	}
 	
 	public TestCaseResult(String name, String group, Long duration, TestRunResult testRunResult) {
 		this(name,group, null, duration, testRunResult);
+	}
+	
+	public TestCaseResult(String name, Long duration, TestRunResult testRunResult) {
+		this(name, null, null, duration, testRunResult);
 	}
 
 	public String getName() {
@@ -36,6 +50,10 @@ public class TestCaseResult {
 
 	public String getGroup() {
 		return group;
+	}
+	
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
 	public String getClassName() {
@@ -58,7 +76,7 @@ public class TestCaseResult {
 	}
 	
 	private ReportEntry getReportEntry(){
-		return new ReportEntry("",this.name,this.group,"");
+		return new ReportEntry(this.className,this.name,this.group,"");
 	}
 	
 }

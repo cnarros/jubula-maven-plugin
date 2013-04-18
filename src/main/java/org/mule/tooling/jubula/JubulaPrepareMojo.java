@@ -1,15 +1,24 @@
 package org.mule.tooling.jubula;
 
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.JUBULA_BOOTSTRAP_VERSION;
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME;
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.initializeContext;
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToJubulaInstallationDirectory;
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToJubulaPluginsDirectory;
+import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToServerPluginsDirectory;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.Format;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,8 +35,6 @@ import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.*;
-
 /**
  * Goal that runs Jubula Functional Tests.
  * 
@@ -35,6 +42,8 @@ import static org.mule.tooling.jubula.JubulaMavenPluginContext.*;
  * @phase pre-integration-test
  */
 public class JubulaPrepareMojo extends AbstractMojo {
+
+	private static final String ORG_ECLIPSE_JUBULA_RC_RCP_1_2_1_201206131127_JAR = "org.eclipse.jubula.rc.rcp_1.2.1.201206131127.jar";
 
 	/**
 	 * 
@@ -64,10 +73,10 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	 * The project's remote repositories to use for the resolution of plugins
 	 * and their dependencies.
 	 * 
-	 * @parameter default-value="${project.remotePluginRepositories}"
+	 * @parameter default-value="${project.remoteArtifactRepositories}"
 	 * @readonly
 	 */
-	private List<RemoteRepository> remoteRepos;
+	private List<MavenArtifactRepository> remoteRepos;
 
 	/**
 	 * Where the .js files will be located for running.
@@ -81,7 +90,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	/**
 	 * RCP target directory.
 	 * 
-	 * @parameter expression="${myRcp}" default-value="asdf"
+	 * @parameter
 	 * @required
 	 */
 	private String rcpTargetDirectory;
@@ -91,26 +100,15 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	 */
 	private List<Dependency> jubulaPlugins;
 
-	/**
-	 * ZipUnArchiver
-	 * 
-	 * @component
-	 */
-	private ZipUnArchiver zipUnArchiver;
-
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("Prepare Jubula Mojo starting");
 
 		initializeContext(buildDirectory);
 
-		getLog().info("JUBULA INST = " + pathToJubulaInstallationDirectory());
-		getLog().info("JUBULA PLUG = " + pathToJubulaPluginsDirectory());
-		getLog().info("SERVER PLUG = " + pathToServerPluginsDirectory());
-
-		// createTestWorkingDirectories();
-		// prepareJubulaInstallation();
-		// copyUserDefinedPluginsToRcp();
+		createTestWorkingDirectories();
+		prepareJubulaInstallation();
+		copyUserDefinedPluginsToRcp();
 	}
 
 	private void prepareJubulaInstallation() throws MojoExecutionException {
@@ -146,9 +144,10 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 			// TODO - Until the RC is uploaded to Maven or shipped with Jubula
 			// bootstrap, we are incluiding it here - miguel
-			FileUtils.copyFileToDirectory( //
-					new File(getRemoteControlArtifactUrl().toURI()), //
-					pluginsDirectory);
+			final File out = new File(pluginsDirectory,
+					ORG_ECLIPSE_JUBULA_RC_RCP_1_2_1_201206131127_JAR);
+			IOUtils.copy(getRemoteControlArtifactStream(),
+					new FileOutputStream(out));
 
 			for (final File artifact : fetchArtifacts()) {
 				FileUtils.copyFileToDirectory(artifact, pluginsDirectory);
@@ -161,15 +160,12 @@ public class JubulaPrepareMojo extends AbstractMojo {
 			throw new MojoExecutionException(
 					"Error copying plugins. Verify that the RCP target directory is correct.",
 					e);
-		} catch (final URISyntaxException e) {
-			throw new MojoExecutionException(
-					"Error when converting RC file URL to URI.", e);
 		}
 	}
 
-	protected URL getRemoteControlArtifactUrl() {
-		return getClass().getClassLoader().getResource(
-				"org.eclipse.jubula.rc.rcp_1.2.1.201206131127.jar");
+	protected InputStream getRemoteControlArtifactStream() {
+		return getClass().getClassLoader().getResourceAsStream(
+				ORG_ECLIPSE_JUBULA_RC_RCP_1_2_1_201206131127_JAR);
 	}
 
 	private List<File> fetchArtifacts() throws MojoExecutionException {
@@ -220,26 +216,15 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	private File fetchArtifact(final Dependency dependency)
 			throws MojoExecutionException {
 
-		return fetchArtifact(makeMavenCoordinates(dependency));
-	}
-
-	private String makeMavenCoordinates(final Dependency dependency) {
-		return String.format("%s:%s:%s:%s", //
-				dependency.getGroupId(), //
-				dependency.getArtifactId(), //
-				dependency.getVersion(), //
-				dependency.getType());
-	}
-
-	public File fetchArtifact(final String mavenCoordinates)
-			throws MojoExecutionException {
 		final ArtifactRequest request = new ArtifactRequest();
-		request.setArtifact(new DefaultArtifact(mavenCoordinates));
-		request.setRepositories(remoteRepos);
+		request.setArtifact(dependencyToArtifact(dependency));
+
+		final List<RemoteRepository> aetherRepos = mavenArtifactRepositories2aetherRepositories();
+
+		request.setRepositories(aetherRepos);
 
 		getLog().info(
-				"Resolving artifact " + mavenCoordinates + " from "
-						+ remoteRepos);
+				"Resolving artifact " + dependency + " from " + aetherRepos);
 
 		ArtifactResult result;
 		try {
@@ -258,10 +243,34 @@ public class JubulaPrepareMojo extends AbstractMojo {
 		return artifact.getFile();
 	}
 
+	protected List<RemoteRepository> mavenArtifactRepositories2aetherRepositories() {
+		final List<RemoteRepository> aetherRepos = new ArrayList<RemoteRepository>();
+		for (final MavenArtifactRepository repo : remoteRepos) {
+			final RemoteRepository remoteRepository = new RemoteRepository(
+					repo.getId(), repo.getLayout().getId(), repo.getUrl());
+			aetherRepos.add(remoteRepository);
+		}
+		return aetherRepos;
+	}
+
+	protected DefaultArtifact dependencyToArtifact(final Dependency dependency) {
+		return new DefaultArtifact( //
+				dependency.getGroupId(), //
+				dependency.getArtifactId(), //
+				dependency.getType(), //
+				dependency.getVersion());
+	}
+
 	public void extract(final File file, final File extractDirectory) {
 		createFile(extractDirectory);
 
 		final ZipUnArchiver zipUnArchiver = new ZipUnArchiver(file);
+		// need to set a logger, because if not, a NPE will be raised by
+		// extract() (shame on Plexus)
+		zipUnArchiver
+				.enableLogging(new org.codehaus.plexus.logging.console.ConsoleLogger(
+						0, "Unzipping"));
+
 		zipUnArchiver.setDestDirectory(extractDirectory);
 		zipUnArchiver.extract();
 	}

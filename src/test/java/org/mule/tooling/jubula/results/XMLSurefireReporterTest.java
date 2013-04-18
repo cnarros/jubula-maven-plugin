@@ -4,13 +4,14 @@ import java.io.File;
 
 import org.apache.maven.surefire.report.ReporterException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class XMLSurefireReporterTest {
 
 	private XMLSurefireReporter reporter;
 	private TestSuiteResult testSuite;
-	
+
 	@Before
 	public void setUp() {
 		reporter = new XMLSurefireReporter(new File("example"));
@@ -27,7 +28,7 @@ public class XMLSurefireReporterTest {
 		testCase = new TestCaseResult("TestCase Name3", 3000L, new TestResultSkipped());
 		testSuite.addTestCaseResult(testCase);
 	}
-	
+
 	@Test
 	public void testReporter() throws ReporterException {
 		testSuite.report(reporter);

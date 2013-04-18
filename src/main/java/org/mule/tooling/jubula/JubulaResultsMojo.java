@@ -16,7 +16,10 @@ import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.mule.tooling.jubula.results.TestCaseResult;
+import org.mule.tooling.jubula.results.TestResultError;
+import org.mule.tooling.jubula.results.TestResultSkipped;
 import org.mule.tooling.jubula.results.TestResultSuccessful;
+import org.mule.tooling.jubula.results.TestRunResult;
 import org.mule.tooling.jubula.results.TestSuiteResult;
 import org.mule.tooling.jubula.results.XMLSurefireGenerator;
 
@@ -74,12 +77,13 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 			// Create the output folder
 			testSuite = new TestSuiteResult(suitName, getProjectName(), getTestSuitDuration());
-			int sequence = 0;
+			int sequence = 1;
 			System.out.println("size:" + listOfTestsResults.size());
 
 			while (sequence < listOfTestsResults.size()) {
 
-				TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), getTestTestDurationById(sequence), new TestResultSuccessful());
+				TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), getTestTestDurationById(sequence),
+						generateRithgResult(getTestResultById(sequence)));
 				testSuite.addTestCaseResult(testCase);
 				sequence++;
 
@@ -168,14 +172,30 @@ public class JubulaResultsMojo extends AbstractMojo {
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
 		Date date;
 		try {
-			date = sdf.parse(node.getStringValue());
-			return date.getTime();
+			if (node != null) {
+				date = sdf.parse(node.getStringValue());
+				long test = date.getTime();
+				return date.getTime();
+			}
+
+			return 0;
+
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return 0;
 		}
 
+	}
+
+	public String getTestResultById(int secuencialID) {
+		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/status");
+
+		if (node != null) {
+			return node.getStringValue();
+		}
+
+		return "2";
 	}
 
 	public Document getHandlerDocument() {
@@ -186,4 +206,20 @@ public class JubulaResultsMojo extends AbstractMojo {
 		this.handlerDocument = handlerDocument;
 	}
 
+	public TestRunResult generateRithgResult(String status) {
+
+		if (mapOfResult.get(status).equals("ERROR")) {
+			return new TestResultSuccessful();
+		}
+
+		if (mapOfResult.get(status).equals("SKIP")) {
+			return new TestResultSkipped();
+		}
+
+		if (mapOfResult.get(status).equals("SUCCESS")) {
+			return new TestResultError();
+		} else
+			return new TestResultError();
+
+	}
 }

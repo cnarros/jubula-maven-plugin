@@ -9,8 +9,10 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.apache.maven.surefire.report.AbstractReporter;
@@ -51,6 +53,8 @@ public class XMLSurefireReporter extends AbstractReporter {
 
 		Xpp3Dom testSuite = createTestSuiteElement(report, runTime);
 
+		showProperties( testSuite );
+		
 		testSuite.setAttribute("tests", String.valueOf(this.getNumTests()));
 
 		testSuite.setAttribute("errors", String.valueOf(this.getNumErrors()));
@@ -241,6 +245,42 @@ public class XMLSurefireReporter extends AbstractReporter {
 
 		return component;
 	}
+	
+	/**
+     * Adds system properties to the XML report.
+     *
+     * @param testSuite
+     */
+    private void showProperties( Xpp3Dom testSuite )
+    {
+        Xpp3Dom properties = createElement( testSuite, "properties" );
+
+        Properties systemProperties = System.getProperties();
+
+        if ( systemProperties != null )
+        {
+            Enumeration propertyKeys = systemProperties.propertyNames();
+
+            while ( propertyKeys.hasMoreElements() )
+            {
+                String key = (String) propertyKeys.nextElement();
+
+                String value = systemProperties.getProperty( key );
+
+                if ( value == null )
+                {
+                    value = "null";
+                }
+
+                Xpp3Dom property = createElement( properties, "property" );
+
+                property.setAttribute( "name", key );
+
+                property.setAttribute( "value", value );
+
+            }
+        }
+    }
 
 	public Iterator<Xpp3Dom> getResults() {
 		return results.iterator();

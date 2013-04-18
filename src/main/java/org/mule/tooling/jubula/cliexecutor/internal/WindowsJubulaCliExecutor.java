@@ -58,7 +58,7 @@ public class WindowsJubulaCliExecutor extends JubulaCliExecutor {
 
 	@Override
 	public boolean runTests(String projectName, String projectVersion, String autId, String databaseUrl, String databaseUser, String databasePassword, String autAgentHost,
-			String autAgentPort, String language, String testJob, String datadir, String minusData, String resultsDir) {
+			String autAgentPort, String language, String testJob, String datadir, String resultsDir) {
 		CliExecutor cliExecutor = getCliExecutor();
 		File jubulaFolder = new File(jubulaInstallationPath, JUBULA_FOLDER);
 		File testExecFile = new File(jubulaFolder, TEST_EXEC_FILENAME);
@@ -86,8 +86,6 @@ public class WindowsJubulaCliExecutor extends JubulaCliExecutor {
 		params.add(testJob);
 		params.add("-datadir");
 		params.add(datadir);
-		params.add("-data");
-		params.add(minusData);
 		params.add("-resultdir");
 		params.add(resultsDir);
 

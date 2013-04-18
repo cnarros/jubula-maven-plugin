@@ -10,12 +10,13 @@ import org.apache.commons.exec.ExecuteResultHandler;
 import org.mule.tooling.jubula.cliexecutor.Callback;
 
 public class DefaultCliExecutor implements CliExecutor {
-	
+
 	@Override
-	public int run(File executable, String params) {
+	public int run(File executable, String... params) {
 		try {
 			DefaultExecutor executor = new DefaultExecutor();
-			CommandLine command = CommandLine.parse(executable.getAbsolutePath() + " " + params);
+			CommandLine command = CommandLine.parse(executable.getAbsolutePath());
+			command.addArguments(params, true);
 			return executor.execute(command);
 		} catch (ExecuteException e) {
 			throw new RuntimeException(e);
@@ -25,17 +26,18 @@ public class DefaultCliExecutor implements CliExecutor {
 	}
 
 	@Override
-	public void runAsync(File executable, final Callback callback, String params) {
+	public void runAsync(File executable, final Callback callback, String... params) {
 		try {
 			DefaultExecutor executor = new DefaultExecutor();
-			CommandLine command = CommandLine.parse(executable.getAbsolutePath() + " " + params);
+			CommandLine command = CommandLine.parse(executable.getAbsolutePath());
+			command.addArguments(params, true);
 			executor.execute(command, new ExecuteResultHandler() {
-				
+
 				@Override
 				public void onProcessFailed(ExecuteException returnCode) {
 					callback.failure(returnCode.getExitValue());
 				}
-				
+
 				@Override
 				public void onProcessComplete(int returnCode) {
 					callback.success(returnCode);

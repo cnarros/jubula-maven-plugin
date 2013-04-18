@@ -17,8 +17,8 @@ public class XMLSurefireReporterTest {
 		testSuite = new TestSuiteResult("TestSuite Name", "Project Name", 4000L);
 		
 		TestCaseResult testCase;
-		
-		testCase = new TestCaseResult("TestCase Name1", 1000000000000003500L, new TestResultSuccessful());
+
+		testCase = new TestCaseResult("TestCase Name1", 11088000L, new TestResultSuccessful());
 		testSuite.addTestCaseResult(testCase);
 
 		testCase = new TestCaseResult("TestCase Name2", 3000L, new TestResultError());

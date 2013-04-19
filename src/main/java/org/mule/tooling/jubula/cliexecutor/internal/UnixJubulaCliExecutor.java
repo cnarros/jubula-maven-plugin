@@ -25,4 +25,10 @@ public class UnixJubulaCliExecutor extends JubulaCliExecutor {
 		return false;
 	}
 
+	@Override
+	public boolean stopAutAgent() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -125,9 +125,11 @@ public class JubulaMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException {
 		JubulaMavenPluginContext.initializeContext(buildDirectory);
-		
-		String jubulaInstallationPath = JubulaMavenPluginContext.pathToJubulaInstallationDirectory();
-		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
+
+		String jubulaInstallationPath = JubulaMavenPluginContext
+				.pathToJubulaInstallationDirectory();
+		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory()
+				.getNewInstance(jubulaInstallationPath);
 
 		SyncCallback startAutAgentCallback = new SyncCallback();
 		// start the aut agent
@@ -137,29 +139,43 @@ public class JubulaMojo extends AbstractMojo {
 		// indication of it, so... wait for a while
 		safeSleep(5000);
 
-		String workspacePath = new File(buildDirectory, JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
+		String workspacePath = new File(buildDirectory,
+				JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME)
+				.getAbsolutePath();
 		SyncCallback startAutCallback = new SyncCallback();
 		String[] hostAndPort = autAgentAddress.split(":");
 		if (hostAndPort.length != 2)
-			throw new MojoExecutionException("Please provide the AUT Agent address as <host>:<port>");
+			throw new MojoExecutionException(
+					"Please provide the AUT Agent address as <host>:<port>");
 
 		String autAgentHost = hostAndPort[0];
 		String autAgentPort = hostAndPort[1];
 
-		jubulaCliExecutor.startAut(autId, rcpWorkingDir, executableFileName, workspacePath, keyboardLayout, autAgentHost, autAgentPort, startAutCallback);
+		try {
+			jubulaCliExecutor.startAut(autId, rcpWorkingDir,
+					executableFileName, workspacePath, keyboardLayout,
+					autAgentHost, autAgentPort, startAutCallback);
 
-		// now we should wait until the aut is live, but there's no
-		// indication of it, so... wait for ANOTHER while
-		// TODO - maybe make this configurable by parameter
-		safeSleep(20000);
+			// now we should wait until the aut is live, but there's no
+			// indication of it, so... wait for ANOTHER while
+			// TODO - maybe make this configurable by parameter
+			safeSleep(20000);
 
-		String datadir = ".";
-		String resultsDir = new File(buildDirectory, JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME).getAbsolutePath();
-		boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
-				keyboardLayout, testJob, datadir, resultsDir);
+			String datadir = ".";
+			String resultsDir = new File(buildDirectory,
+					JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME)
+					.getAbsolutePath();
+			boolean runTests = jubulaCliExecutor.runTests(projectName,
+					projectVersion, workspacePath, databaseUrl, databaseUser,
+					databasePassword, autAgentHost, autAgentPort,
+					keyboardLayout, testJob, datadir, resultsDir);
 
-		if (!runTests)
-			throw new MojoExecutionException("There were errors running the tests");
+			if (!runTests)
+				throw new MojoExecutionException(
+						"There were errors running the tests");
+		} finally {
+			jubulaCliExecutor.stopAutAgent();
+		}
 	}
 
 	private void safeSleep(long millis) {

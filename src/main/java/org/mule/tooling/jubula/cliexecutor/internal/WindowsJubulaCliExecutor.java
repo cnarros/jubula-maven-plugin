@@ -9,9 +9,10 @@ import org.mule.tooling.jubula.cliexecutor.JubulaCliExecutor;
 
 public class WindowsJubulaCliExecutor extends JubulaCliExecutor {
 
-	private static String START_AUT_AGENT_FILENAME = "autagent.exe";
-	private static String START_AUT_FILENAME = "autrun.exe";
-	private static String TEST_EXEC_FILENAME = "testexec.exe";
+	private static final String STOP_AUT_AGENT_FILENAME = "stopautagent.exe";
+	private static final String START_AUT_AGENT_FILENAME = "autagent.exe";
+	private static final String START_AUT_FILENAME = "autrun.exe";
+	private static final String TEST_EXEC_FILENAME = "testexec.exe";
 	private String jubulaInstallationPath;
 
 	public WindowsJubulaCliExecutor(String jubulaInstallationPath) {
@@ -90,5 +91,13 @@ public class WindowsJubulaCliExecutor extends JubulaCliExecutor {
 		params.add(resultsDir);
 
 		return cliExecutor.run(testExecFile, params.toArray(new String[] {})) == 0;
+	}
+
+	@Override
+	public boolean stopAutAgent() {
+		CliExecutor cliExecutor = getCliExecutor();
+		File serverFolder = new File(jubulaInstallationPath, SERVER_FOLDER);
+		File startAutAgentFile = new File(serverFolder, STOP_AUT_AGENT_FILENAME);
+		return cliExecutor.run(startAutAgentFile, new String[] {}) == 0;
 	}
 }

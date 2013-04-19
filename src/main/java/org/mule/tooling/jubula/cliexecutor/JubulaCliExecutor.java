@@ -22,4 +22,6 @@ public abstract class JubulaCliExecutor {
 
 	public abstract boolean runTests(String projectName, String projectVersion, String autId, String databaseUrl, String databaseUser, String databasePassword,
 			String autAgentHost, String autAgentPort, String language, String testJob, String datadir, String resultsDir);
+
+	public abstract boolean stopAutAgent(); 
 }

@@ -13,12 +13,12 @@
 				<artifactId>jubula-maven-plugin</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-					<myRcp>saraza</myRcp>
+					<rcpTargetDirectory>${basedir}/foorcp</rcpTargetDirectory>
 					<jubulaPlugins>
 						<dependency>
-							<groupId>org.alejjjjo</groupId>
-							<artifactId>pamela</artifactId>
-							<version>1</version>
+							<groupId>junit</groupId>
+							<artifactId>junit</artifactId>
+							<version>4.10</version>
 						</dependency>
 					</jubulaPlugins>
 				</configuration>
@@ -33,5 +33,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+			<id>mule-ee-releases</id>
+			<name>MuleEE Releases Repository</name>
+			<url>http://dev.ee.mulesource.com/repository/content/repositories/releases/</url>
+		</repository>
+	</repositories>
 
 </project>

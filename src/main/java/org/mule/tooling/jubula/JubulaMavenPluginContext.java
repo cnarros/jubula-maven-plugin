@@ -34,7 +34,7 @@ public abstract class JubulaMavenPluginContext {
 
 	public static String pathToJubulaInstallationDirectory() {
 		return MessageFormat.format( //
-				"{2}{1}jubula-bootstrap-{0}{1}jubula", //
+				"{2}{1}jubula-bootstrap-{0}", //
 				JUBULA_BOOTSTRAP_VERSION, //
 				File.separator, //
 				buildDirectory.getAbsolutePath());

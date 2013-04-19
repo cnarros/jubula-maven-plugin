@@ -65,31 +65,37 @@ public class XMLJubulaParser {
 		try {
 			File [] files = folder.listFiles(fileFilter);
 			
-			for(File file : files){
-				currentDocument = this.openAndPrepareXML(file);
-			
-				String suitName = getTestSuitName();
-				List<Node> listOfTestsResults = getListOfResults();
-
-				TestSuiteResult testSuite = new TestSuiteResult(suitName, getProjectName(), getTestSuitDuration());
-				
-				int sequence = 1;
-
-				while (sequence < listOfTestsResults.size()) {
-
-					TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), getTestTestDurationById(sequence),
-							generateRithgResult(getTestResultById(sequence)));
-					testSuite.addTestCaseResult(testCase);
-					sequence++;
-				}
-				
-				suites.add(testSuite);
+			if(files != null){
+				this.generateSuitesList(files, suites);
 			}
 
 		} catch (DocumentException e) {
 		}
 		
 		return suites;
+	}
+	
+	private void generateSuitesList(File [] files, List<TestSuiteResult> testSuites) throws DocumentException{
+		for(File file : files){
+			currentDocument = this.openAndPrepareXML(file);
+		
+			String suitName = getTestSuitName();
+			List<Node> listOfTestsResults = getListOfResults();
+
+			TestSuiteResult testSuite = new TestSuiteResult(suitName, getProjectName(), getTestSuitDuration());
+			
+			int sequence = 1;
+
+			while (sequence < listOfTestsResults.size()) {
+
+				TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), getTestTestDurationById(sequence),
+						generateRithgResult(getTestResultById(sequence)));
+				testSuite.addTestCaseResult(testCase);
+				sequence++;
+			}
+			
+			testSuites.add(testSuite);
+		}
 	}
 	
 	private Document getHandlerDocument(){

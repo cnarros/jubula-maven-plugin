@@ -64,6 +64,8 @@ public class JubulaResultsMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		String buildDirectory = "example";
+		
 		String jubulaResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
 		String surefireResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
 		
@@ -75,7 +77,6 @@ public class JubulaResultsMojo extends AbstractMojo {
 		} catch (XMLSurefireGeneratorException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void handResults() throws DocumentException {

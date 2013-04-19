@@ -113,7 +113,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	private void prepareJubulaInstallation() throws MojoExecutionException {
 		final File jubula = fetchArtifact(getJubulaBootsrapDependency());
-		extract(jubula, new File(pathToJubulaInstallationDirectory()));
+		extract(jubula, buildDirectory);
 
 		copyServerJubulaPluginsToJubulaPlugins();
 	}

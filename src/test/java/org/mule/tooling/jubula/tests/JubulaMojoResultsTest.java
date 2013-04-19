@@ -74,7 +74,7 @@ public class JubulaMojoResultsTest extends AbstractMojoTestCase {
 
 		when(repoSystem.resolveArtifact(any(RepositorySystemSession.class), any(ArtifactRequest.class))).thenReturn(artifactResult);
 
-		// setVariableValueToObject(jubulaMojo, "project", project);
+		//		 setVariableValueToObject(jubulaMojo, "project", project);
 		// setVariableValueToObject(jubulaMojo, "repoSystem", repoSystem);
 		// setVariableValueToObject(jubulaMojo, "repoSession", repoSession);
 		// setVariableValueToObject(jubulaMojo, "remoteRepos", remoteRepos);

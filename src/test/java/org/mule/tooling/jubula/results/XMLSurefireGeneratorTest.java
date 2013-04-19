@@ -5,6 +5,8 @@ import java.io.File;
 import org.apache.maven.surefire.report.ReporterException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGenerator;
+import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGeneratorException;
 
 public class XMLSurefireGeneratorTest {
 

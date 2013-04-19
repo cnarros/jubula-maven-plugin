@@ -1,4 +1,4 @@
-package org.mule.tooling.jubula.results;
+package org.mule.tooling.jubula.xmlgenerator;
 
 import org.apache.maven.surefire.report.ReporterException;
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.ReporterException;
+import org.mule.tooling.jubula.xmlgenerator.XMLSurefireReporter;
 
 public class TestSuiteResult {
 

@@ -1,6 +1,7 @@
 package org.mule.tooling.jubula.results;
 
 import org.apache.maven.surefire.report.ReportEntry;
+import org.mule.tooling.jubula.xmlgenerator.XMLSurefireReporter;
 
 public abstract class TestRunResult {
 	

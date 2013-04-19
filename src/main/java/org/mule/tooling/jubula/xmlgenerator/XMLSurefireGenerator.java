@@ -1,9 +1,10 @@
-package org.mule.tooling.jubula.results;
+package org.mule.tooling.jubula.xmlgenerator;
 
 import java.io.File;
 import java.util.List;
 
 import org.apache.maven.surefire.report.ReporterException;
+import org.mule.tooling.jubula.results.TestSuiteResult;
 
 public class XMLSurefireGenerator {
 	

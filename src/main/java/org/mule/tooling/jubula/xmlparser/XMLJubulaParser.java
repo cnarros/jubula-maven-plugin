@@ -1,16 +1,15 @@
-package org.mule.tooling.jubula;
+package org.mule.tooling.jubula.xmlparser;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
@@ -21,29 +20,11 @@ import org.mule.tooling.jubula.results.TestResultSkipped;
 import org.mule.tooling.jubula.results.TestResultSuccessful;
 import org.mule.tooling.jubula.results.TestRunResult;
 import org.mule.tooling.jubula.results.TestSuiteResult;
-import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGenerator;
-import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGeneratorException;
-import org.mule.tooling.jubula.xmlparser.XMLJubulaParser;
 
-/**
- * Goal that runs Jubula Functional Tests.
- * 
- * @goal report-results
- * @phase post-integration-test
- */
-public class JubulaResultsMojo extends AbstractMojo {
-
-	/**
-	 * Where the .js files will be located for running.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @readonly
-	 * @required
-	 */
-	private File buildDirectory;
-
-	private String archiveSource = getClass().getClassLoader().getResource("executionLog.xml").getFile();
-	private Document handlerDocument;
+public class XMLJubulaParser {
+	
+	private File folder;
+	private Document currentDocument;
 	private static Map<String, String> mapOfResult;
 
 	static {
@@ -61,41 +42,73 @@ public class JubulaResultsMojo extends AbstractMojo {
 		mapOfResult.put("8", "SUCCESS");
 		mapOfResult.put("other", "Assertion faild");
 	}
-
-	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		String jubulaResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
-		String surefireResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
+	
+	private FilenameFilter fileFilter = new FilenameFilter(){
 		
-		List<TestSuiteResult> testSuites = new XMLJubulaParser(jubulaResultsFolder).generateSuites();		
-		XMLSurefireGenerator generator = new XMLSurefireGenerator(surefireResultsFolder);
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.endsWith(".xml");
+		}};
+
+	
+	public XMLJubulaParser(String folder){
+		if(folder == null){
+			throw new IllegalArgumentException();
+		}
+		
+		this.folder = new File(folder);
+	}		
+
+	public List<TestSuiteResult> generateSuites() {
+		List<TestSuiteResult> suites = new ArrayList<TestSuiteResult>();;
 		
 		try {
-			generator.generateXML(testSuites);
-		} catch (XMLSurefireGeneratorException e) {
-			e.printStackTrace();
+			File [] files = folder.listFiles(fileFilter);
+			
+			for(File file : files){
+				currentDocument = this.openAndPrepareXML(file);
+			
+				String suitName = getTestSuitName();
+				List<Node> listOfTestsResults = getListOfResults();
+
+				TestSuiteResult testSuite = new TestSuiteResult(suitName, getProjectName(), getTestSuitDuration());
+				
+				int sequence = 1;
+
+				while (sequence < listOfTestsResults.size()) {
+
+					TestCaseResult testCase = new TestCaseResult(getTestNameByID(sequence), getTestTestDurationById(sequence),
+							generateRithgResult(getTestResultById(sequence)));
+					testSuite.addTestCaseResult(testCase);
+					sequence++;
+				}
+				
+				suites.add(testSuite);
+			}
+
+		} catch (DocumentException e) {
 		}
-
+		
+		return suites;
 	}
-
-	public void handResults() throws DocumentException {
-		Document document = OpenAndPrepareXML();
+	
+	private Document getHandlerDocument(){
+		return currentDocument;
 	}
-
-	public Document OpenAndPrepareXML() throws DocumentException {
+	
+	public Document openAndPrepareXML(File file) throws DocumentException {
 		SAXReader reader = new SAXReader();
-		Document document = reader.read(archiveSource);
-		setHandlerDocument(document);
+		Document document = reader.read(file.getAbsolutePath());
 		return document;
 	}
-
+	
 	public List<Node> getListOfResults() {
 
 		@SuppressWarnings("unchecked")
 		List<Node> nodes = getHandlerDocument().selectNodes("//testsuite/test-run/testcase");
 		return nodes;
 	}
-
+	
 	public String getTestName() {
 		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase/name");
 		Node nodeAtribute = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase/parameter/parameter-value");
@@ -141,9 +154,18 @@ public class JubulaResultsMojo extends AbstractMojo {
 			e.printStackTrace();
 			return 0;
 		}
-
 	}
+	
+	public String getTestResultById(int secuencialID) {
+		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/status");
 
+		if (node != null) {
+			return node.getStringValue();
+		}
+
+		return "2";
+	}
+	
 	public long getTestTestDurationById(int secuencialID) {
 		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/@duration");
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
@@ -151,7 +173,6 @@ public class JubulaResultsMojo extends AbstractMojo {
 		try {
 			if (node != null) {
 				date = sdf.parse(node.getStringValue());
-				long test = date.getTime();
 				return date.getTime();
 			}
 
@@ -164,25 +185,7 @@ public class JubulaResultsMojo extends AbstractMojo {
 		}
 
 	}
-
-	public String getTestResultById(int secuencialID) {
-		Node node = getHandlerDocument().selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/status");
-
-		if (node != null) {
-			return node.getStringValue();
-		}
-
-		return "2";
-	}
-
-	public Document getHandlerDocument() {
-		return handlerDocument;
-	}
-
-	public void setHandlerDocument(Document handlerDocument) {
-		this.handlerDocument = handlerDocument;
-	}
-
+	
 	public TestRunResult generateRithgResult(String status) {
 
 		if (mapOfResult.get(status).equals("ERROR")) {
@@ -199,4 +202,5 @@ public class JubulaResultsMojo extends AbstractMojo {
 			return new TestResultError();
 
 	}
+
 }

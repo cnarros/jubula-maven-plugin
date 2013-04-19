@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -74,7 +75,7 @@ public class JubulaMojoResultsTest extends AbstractMojoTestCase {
 
 		when(repoSystem.resolveArtifact(any(RepositorySystemSession.class), any(ArtifactRequest.class))).thenReturn(artifactResult);
 
-		//		 setVariableValueToObject(jubulaMojo, "project", project);
+		// setVariableValueToObject(jubulaMojo, "project", project);
 		// setVariableValueToObject(jubulaMojo, "repoSystem", repoSystem);
 		// setVariableValueToObject(jubulaMojo, "repoSession", repoSession);
 		// setVariableValueToObject(jubulaMojo, "remoteRepos", remoteRepos);
@@ -83,61 +84,9 @@ public class JubulaMojoResultsTest extends AbstractMojoTestCase {
 	}
 
 	@Test
-	public void testOpenDocument() throws Exception {
-		jubulaMojo.OpenAndPrepareXML();
-	}
-
-	@Test
-	public void getNameOfTest() throws Exception {
-		jubulaMojo.handResults();
-		assertEquals("Create Project via Menu (projectName=loremipsum)", jubulaMojo.getTestName());
-	}
-
-	@Test
-	public void getSuiteNameTest() throws Exception {
-		jubulaMojo.handResults();
-		assertEquals("Sanity Tests", jubulaMojo.getTestSuitName());
-	}
-
-	@Test
-	public void getSuiteResultTest() throws Exception {
-		jubulaMojo.handResults();
-		assertEquals("ERROR", jubulaMojo.getTestSuitResult());
-	}
-
-	@Test
-	public void getSuiteDurationTest() throws Exception {
-		jubulaMojo.handResults();
-		assertEquals(11088000, jubulaMojo.getTestSuitDuration());
-	}
-
-	@Test
-	public void getSuiteDurationEmptyTest() throws Exception {
-		jubulaMojo.handResults();
-		assertEquals(11088000, jubulaMojo.getTestSuitDuration());
-	}
-
-	@Test
-	public void getResultByNumberTest() throws Exception {
-		jubulaMojo.handResults();
-
-		assertEquals("Create Project via Menu (projectName=loremipsum)", jubulaMojo.getTestNameByID(1));
-
-		assertEquals("Create Templates (projectName=hello-world)", jubulaMojo.getTestNameByID(4));
-
-		assertEquals("Not Provided", jubulaMojo.getTestNameByID(6));
-	}
-
-	@Test
-	public void getResultWithErrorTest() throws Exception {
-		jubulaMojo.handResults();
-
-		assertEquals("Not Provided", jubulaMojo.getTestNameByID(2));
-
-	}
-
-	@Test
+	@Ignore
 	public void funtionalTest() throws Exception {
 		jubulaMojo.execute();
 	}
+	
 }

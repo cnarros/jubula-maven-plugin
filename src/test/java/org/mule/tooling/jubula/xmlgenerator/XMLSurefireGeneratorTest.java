@@ -1,12 +1,15 @@
-package org.mule.tooling.jubula.results;
+package org.mule.tooling.jubula.xmlgenerator;
 
 import java.io.File;
 
 import org.apache.maven.surefire.report.ReporterException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGenerator;
-import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGeneratorException;
+import org.mule.tooling.jubula.results.TestCaseResult;
+import org.mule.tooling.jubula.results.TestResultError;
+import org.mule.tooling.jubula.results.TestResultSkipped;
+import org.mule.tooling.jubula.results.TestResultSuccessful;
+import org.mule.tooling.jubula.results.TestSuiteResult;
 
 public class XMLSurefireGeneratorTest {
 
@@ -14,7 +17,7 @@ public class XMLSurefireGeneratorTest {
 	
 	@Before
 	public void setUp() {
-		testSuite = new TestSuiteResult("TestSuite Name", "Project Name", 4000L);
+		testSuite = new TestSuiteResult("TestGenerator", "Project Name", 4000L);
 		
 		TestCaseResult testCase;
 		
@@ -30,7 +33,7 @@ public class XMLSurefireGeneratorTest {
 	
 	@Test
 	public void testGenerator() throws ReporterException, XMLSurefireGeneratorException {
-		XMLSurefireGenerator generator = new XMLSurefireGenerator("generatorExample");
+		XMLSurefireGenerator generator = new XMLSurefireGenerator("testFiles" + File.separator + "surefire-reports");
 		generator.generateXML(testSuite);
 	}
 

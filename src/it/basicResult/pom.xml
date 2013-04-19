@@ -13,7 +13,14 @@
 				<artifactId>jubula-maven-plugin</artifactId>
 				<version>@project.version@</version>
 				<configuration>
-
+					<rcpTargetDirectory>${basedir}/foorcp</rcpTargetDirectory>
+					<jubulaPlugins>
+						<dependency>
+							<groupId>junit</groupId>
+							<artifactId>junit</artifactId>
+							<version>4.10</version>
+						</dependency>
+					</jubulaPlugins>
 				</configuration>
 				<executions>
 					<execution>

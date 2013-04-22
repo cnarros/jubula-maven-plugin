@@ -126,10 +126,15 @@ public class JubulaMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		JubulaMavenPluginContext.initializeContext(buildDirectory);
 
+<<<<<<< HEAD
 		String jubulaInstallationPath = JubulaMavenPluginContext
 				.pathToJubulaInstallationDirectory();
 		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory()
 				.getNewInstance(jubulaInstallationPath);
+=======
+		String jubulaInstallationPath = JubulaMavenPluginContext.pathToJubulaInstallationDirectory();
+		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
+>>>>>>> Rename + TODO
 
 		SyncCallback startAutAgentCallback = new SyncCallback();
 		// start the aut agent
@@ -139,9 +144,14 @@ public class JubulaMojo extends AbstractMojo {
 		// indication of it, so... wait for a while
 		safeSleep(5000);
 
+<<<<<<< HEAD
 		String workspacePath = new File(buildDirectory,
 				JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME)
 				.getAbsolutePath();
+=======
+		// TODO: make shortcut in JubulaMavenPluginContext
+		String workspacePath = new File(buildDirectory, JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
+>>>>>>> Rename + TODO
 		SyncCallback startAutCallback = new SyncCallback();
 		String[] hostAndPort = autAgentAddress.split(":");
 		if (hostAndPort.length != 2)
@@ -151,6 +161,7 @@ public class JubulaMojo extends AbstractMojo {
 		String autAgentHost = hostAndPort[0];
 		String autAgentPort = hostAndPort[1];
 
+<<<<<<< HEAD
 		try {
 			jubulaCliExecutor.startAut(autId, rcpWorkingDir,
 					executableFileName, workspacePath, keyboardLayout,
@@ -176,6 +187,23 @@ public class JubulaMojo extends AbstractMojo {
 		} finally {
 			jubulaCliExecutor.stopAutAgent();
 		}
+=======
+		jubulaCliExecutor.startAut(autId, rcpWorkingDir, executableFileName, workspacePath, keyboardLayout, autAgentHost, autAgentPort, startAutCallback);
+
+		// now we should wait until the aut is live, but there's no
+		// indication of it, so... wait for ANOTHER while
+		// TODO - maybe make this configurable by parameter
+		safeSleep(20000);
+
+		String datadir = ".";
+		// TODO: make shortcut in JubulaMavenPluginContext
+		String resultsDir = new File(buildDirectory, JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME).getAbsolutePath();
+		boolean ranSuccessfully = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
+				keyboardLayout, testJob, datadir, resultsDir);
+
+		if (!ranSuccessfully)
+			throw new MojoExecutionException("There were errors running the tests");
+>>>>>>> Rename + TODO
 	}
 
 	private void safeSleep(long millis) {

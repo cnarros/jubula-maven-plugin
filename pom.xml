@@ -174,6 +174,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>junit-addons</groupId>
+			<artifactId>junit-addons</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.maven.surefire</groupId>
 			<artifactId>surefire-api</artifactId>
 			<version>2.4.3</version>

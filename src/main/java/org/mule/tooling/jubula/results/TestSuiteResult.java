@@ -89,5 +89,50 @@ public class TestSuiteResult {
 	private ReportEntry getReportEntry(){
 		return new ReportEntry("",this.name,this.group,"");
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((duration == null) ? 0 : duration.hashCode());
+		result = prime * result + ((group == null) ? 0 : group.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((testCaseResults == null) ? 0 : testCaseResults.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TestSuiteResult other = (TestSuiteResult) obj;
+		if (duration == null) {
+			if (other.duration != null)
+				return false;
+		} else if (!duration.equals(other.duration))
+			return false;
+		if (group == null) {
+			if (other.group != null)
+				return false;
+		} else if (!group.equals(other.group))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (testCaseResults == null) {
+			if (other.testCaseResults != null)
+				return false;
+		} else if (!testCaseResults.equals(other.testCaseResults))
+			return false;
+		return true;
+	}
 	
 }

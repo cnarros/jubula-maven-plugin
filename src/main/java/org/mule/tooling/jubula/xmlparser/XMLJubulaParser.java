@@ -46,20 +46,19 @@ public class XMLJubulaParser {
 		mapOfResult.put("7", "SKIP");
 		mapOfResult.put("1", "SUCCESS");
 		mapOfResult.put("8", "SUCCESS");
-		mapOfResult.put("other", "Assertion faild");
 		
 		return mapOfResult;
 	}
 	
 	public List<TestSuiteResult> generateSuitesFromFolder(String folderName) throws XMLJubulaParserException {
 		File folder = this.obtainFolder(folderName);
-		
 		List<TestSuiteResult> suites = new ArrayList<TestSuiteResult>();
 		
-		File [] files = folder.listFiles(fileFilter);
-		
 		try {
-			suites = this.generateSuitesList(files);
+			if(folder.isDirectory()){
+				File [] files = folder.listFiles(fileFilter);
+				suites = this.generateSuitesList(files);
+			}
 		} catch (DocumentException e) {
 			throw new XMLJubulaParserException("XML Jubula parsing failed",e);
 		}
@@ -71,14 +70,7 @@ public class XMLJubulaParser {
 		if(folderName == null){
 			throw new IllegalArgumentException();
 		}
-		
-		File folder = new File(folderName);
-		
-		if(!folder.isDirectory()){
-			throw new IllegalArgumentException();
-		}
-		
-		return folder;
+		return new File(folderName);
 	}
 
 	public TestSuiteResult generateSuite(File file) throws DocumentException {
@@ -92,7 +84,7 @@ public class XMLJubulaParser {
 		
 		int sequence = 1;
 		
-		while (sequence < listOfTestsResults.size()) {
+		while (sequence <= listOfTestsResults.size()) {
 			TestCaseResult testCase = new TestCaseResult(documentParser.getTestNameByID(sequence), documentParser.getTestTestDurationById(sequence),
 					generateRightResult(documentParser.getTestResultById(sequence)));
 			testSuite.addTestCaseResult(testCase);
@@ -122,17 +114,18 @@ public class XMLJubulaParser {
 	}
 	
 	private TestRunResult generateRightResult(String status) {
+		String code = mapOfResult.get(status);
 
-		if (mapOfResult.get(status).equals("ERROR")) {
-			return new TestResultSuccessful();
+		if(code == null){
+			return new TestResultError();
 		}
-
+		
 		if (mapOfResult.get(status).equals("SKIP")) {
 			return new TestResultSkipped();
 		}
-
+		
 		if (mapOfResult.get(status).equals("SUCCESS")) {
-			return new TestResultError();
+			return new TestResultSuccessful();
 		}
 
 		return new TestResultError();

@@ -9,6 +9,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mule.tooling.jubula.JubulaMavenPluginContext;
 
 public class JubulaDocumentParserTest {
 	private static JubulaDocumentParser parser; 
@@ -16,7 +17,7 @@ public class JubulaDocumentParserTest {
 	@BeforeClass
 	public static void setUp() throws DocumentException{
 		SAXReader reader = new SAXReader();
-		Document document = reader.read("testFiles" + File.separator + "results" + File.separator + "jubulaTestResult1.xml");
+		Document document = reader.read("testFiles" + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME + File.separator + "jubulaTestResult1.xml");
 		parser = new JubulaDocumentParser(document);
 	}
 
@@ -37,7 +38,7 @@ public class JubulaDocumentParserTest {
 
 	@Test
 	public void getSuiteDurationTest() throws Exception {
-		assertEquals(11088000, parser.getTestSuitDuration());
+		assertEquals(288000, parser.getTestSuitDuration());
 	}
 
 	@Test

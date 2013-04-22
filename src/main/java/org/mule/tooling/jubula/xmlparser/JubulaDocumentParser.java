@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -35,11 +36,16 @@ public class JubulaDocumentParser {
 		Node node = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/name");
 		Node nodeAtribute = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/parameter/parameter-value");
 
-		if (nodeAtribute == null) {
-			return "Not Provided";
+		String name = "Not Provided";
+		
+		if(node != null){
+			name = node.getStringValue();
+			if (nodeAtribute != null) {
+				name += " (projectName=" + nodeAtribute.getStringValue() + ")";
+			}
 		}
 
-		return node.getStringValue() + " (projectName=" + nodeAtribute.getStringValue() + ")";
+		return name;
 	}
 
 	public String getTestSuitName() {
@@ -55,12 +61,12 @@ public class JubulaDocumentParser {
 	public long getTestSuitDuration() {
 		Node node = document.selectSingleNode("//test-length");
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		Date date;
 		try {
 			date = sdf.parse(node.getStringValue());
 			return date.getTime();
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return 0;
 		}
@@ -78,6 +84,7 @@ public class JubulaDocumentParser {
 	public long getTestTestDurationById(int secuencialID) {
 		Node node = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/@duration");
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		Date date;
 		try {
 			if (node != null) {

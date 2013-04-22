@@ -29,13 +29,19 @@ public class XMLSurefireReporter extends AbstractReporter {
 	private static final Double MILLIS_PER_SECOND = 1000d;
 
 	private File reportsDirectory;
+	private Boolean printProperties;
 
 	private List<Xpp3Dom> results = Collections.synchronizedList(new ArrayList<Xpp3Dom>());
 
 	public XMLSurefireReporter(File reportsDirectory) {
-		super(true);
+		super(false);
 
 		this.reportsDirectory = reportsDirectory;
+		this.printProperties = true;
+	}
+	
+	public void setPrintProperties(Boolean printProperties) {
+		this.printProperties = printProperties;
 	}
 	
 	public void testSetCompleted(ReportEntry report) throws ReporterException {
@@ -55,7 +61,9 @@ public class XMLSurefireReporter extends AbstractReporter {
 
 		Xpp3Dom testSuite = createTestSuiteElement(report, runTime);
 
-		showProperties( testSuite );
+		if(printProperties){
+			showProperties( testSuite );			
+		}
 		
 		testSuite.setAttribute("tests", String.valueOf(this.getNumTests()));
 

@@ -18,6 +18,14 @@ public class XMLSurefireGenerator {
 		this.reporter = new XMLSurefireReporter(new File(folder));
 	}
 	
+	public XMLSurefireGenerator(String folder, Boolean printProperties){
+		this(folder);
+		
+		if(printProperties != null){
+			reporter.setPrintProperties(printProperties);
+		}
+	}
+	
 	public void generateXML(TestSuiteResult suite) throws XMLSurefireGeneratorException{
 		try {
 			suite.report(reporter);

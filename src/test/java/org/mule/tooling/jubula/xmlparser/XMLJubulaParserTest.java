@@ -3,11 +3,16 @@ package org.mule.tooling.jubula.xmlparser;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dom4j.DocumentException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mule.tooling.jubula.JubulaMavenPluginContext;
+import org.mule.tooling.jubula.results.TestCaseResult;
+import org.mule.tooling.jubula.results.TestResultSkipped;
+import org.mule.tooling.jubula.results.TestResultSuccessful;
 import org.mule.tooling.jubula.results.TestSuiteResult;
 
 public class XMLJubulaParserTest {
@@ -20,34 +25,63 @@ public class XMLJubulaParserTest {
 
 	@Test
 	public void generateSuiteTest() throws DocumentException {
-		TestSuiteResult suite = parser.generateSuite(new File("testFiles" + File.separator + "results" + File.separator + "jubulaTestResult1.xml"));
+		TestSuiteResult suite = parser.generateSuite(new File("testFiles" + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME + File.separator + "jubulaTestResult1.xml"));
 		
-		TestSuiteResult suiteExpected = new TestSuiteResult("Sanity Tests", "MuleStudio 1.0", 11088000L);
-		assertEquals(suiteExpected.getName(), suite.getName());
-		assertEquals(suiteExpected.getGroup(), suite.getGroup());
-		assertEquals(suiteExpected.getDuration(), suite.getDuration());
+		TestSuiteResult suiteExpected = new TestSuiteResult("Sanity Tests", "MuleStudio 1.0", 288000L);
+		
+		TestCaseResult testCase;
+
+		testCase = new TestCaseResult("Create Project via Menu (projectName=loremipsum)", 41000L, new TestResultSuccessful());
+		suiteExpected.addTestCaseResult(testCase);
+
+		testCase = new TestCaseResult("Basic Usage (projectName=basicusage)", 51000L, new TestResultSuccessful());
+		suiteExpected.addTestCaseResult(testCase);
+		
+		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());
+		suiteExpected.addTestCaseResult(testCase);
+		
+		assertEquals(suiteExpected, suite);
 	}
 	
 	@Test
 	public void generateSuitesTest() throws XMLJubulaParserException {
-		List<TestSuiteResult> suites = parser.generateSuitesFromFolder("testFiles" + File.separator + "results");
+		List<TestSuiteResult> suites = parser.generateSuitesFromFolder("testFiles" + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME);
 		
-		TestSuiteResult suite;
+		List<TestSuiteResult> suitesExpected = new ArrayList<TestSuiteResult>();
+		
 		TestSuiteResult suiteExpected;
+		TestCaseResult testCase;
 		
-		suite = suites.get(0);
-		suiteExpected = new TestSuiteResult("Sanity Tests", "MuleStudio 1.0", 11088000L);
+		suiteExpected = new TestSuiteResult("Sanity Tests", "MuleStudio 1.0", 288000L);
+
+		testCase = new TestCaseResult("Create Project via Menu (projectName=loremipsum)", 41000L, new TestResultSuccessful());
+		suiteExpected.addTestCaseResult(testCase);
+
+		testCase = new TestCaseResult("Basic Usage (projectName=basicusage)", 51000L, new TestResultSuccessful());
+		suiteExpected.addTestCaseResult(testCase);
 		
-		assertEquals(suiteExpected.getName(), suite.getName());
-		assertEquals(suiteExpected.getGroup(), suite.getGroup());
-		assertEquals(suiteExpected.getDuration(), suite.getDuration());
+		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());
+		suiteExpected.addTestCaseResult(testCase);
 		
-		suiteExpected = new TestSuiteResult("Sanity Tests 2", "MuleStudio 1.0", 11088000L);
-		suite = suites.get(1);
+		suitesExpected.add(suiteExpected);
 		
-		assertEquals(suiteExpected.getName(), suite.getName());
-		assertEquals(suiteExpected.getGroup(), suite.getGroup());
-		assertEquals(suiteExpected.getDuration(), suite.getDuration());
+		suiteExpected = new TestSuiteResult("Sanity Tests 2", "MuleStudio 1.0", 288000L);
+
+		testCase = new TestCaseResult("Create Project via Menu (projectName=loremipsum)", 41000L, new TestResultSuccessful());
+		suiteExpected.addTestCaseResult(testCase);
+
+		testCase = new TestCaseResult("Basic Usage (projectName=basicusage)", 51000L, new TestResultSuccessful());
+		suiteExpected.addTestCaseResult(testCase);
+		
+		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());
+		suiteExpected.addTestCaseResult(testCase);
+		
+		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());
+		suiteExpected.addTestCaseResult(testCase);
+		
+		suitesExpected.add(suiteExpected);
+		
+		assertEquals(suitesExpected, suites);
 	}
 
 }

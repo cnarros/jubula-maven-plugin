@@ -9,12 +9,18 @@
 package org.mule.tooling.jubula;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.mule.tooling.jubula.cliexecutor.JubulaCliExecutor;
 import org.mule.tooling.jubula.cliexecutor.JubulaCliExecutorFactory;
 import org.mule.tooling.jubula.cliexecutor.SyncCallback;
+import org.mule.tooling.jubula.results.TestSuiteResult;
+import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGenerator;
+import org.mule.tooling.jubula.xmlgenerator.XMLSurefireGeneratorException;
+import org.mule.tooling.jubula.xmlparser.XMLJubulaParser;
+import org.mule.tooling.jubula.xmlparser.XMLJubulaParserException;
 
 /**
  * Goal that runs Jubula Functional Tests.
@@ -124,13 +130,11 @@ public class JubulaMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
+		// TODO - get rid of this static initialization, refactor JubulaMavenPluginContext
 		JubulaMavenPluginContext.initializeContext(buildDirectory);
 
-		String jubulaInstallationPath = JubulaMavenPluginContext
-				.pathToJubulaInstallationDirectory();
-		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory()
-				.getNewInstance(jubulaInstallationPath);
-
+		String jubulaInstallationPath = JubulaMavenPluginContext.pathToJubulaInstallationDirectory();
+		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
 
 		SyncCallback startAutAgentCallback = new SyncCallback();
 		// start the aut agent
@@ -140,23 +144,18 @@ public class JubulaMojo extends AbstractMojo {
 		// indication of it, so... wait for a while
 		safeSleep(5000);
 
-		String workspacePath = new File(buildDirectory,
-				JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME)
-				.getAbsolutePath();
+		String workspacePath = new File(buildDirectory, JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
 
 		SyncCallback startAutCallback = new SyncCallback();
 		String[] hostAndPort = autAgentAddress.split(":");
 		if (hostAndPort.length != 2)
-			throw new MojoExecutionException(
-					"Please provide the AUT Agent address as <host>:<port>");
+			throw new MojoExecutionException("Please provide the AUT Agent address as <host>:<port>");
 
 		String autAgentHost = hostAndPort[0];
 		String autAgentPort = hostAndPort[1];
 
 		try {
-			jubulaCliExecutor.startAut(autId, rcpWorkingDir,
-					executableFileName, workspacePath, keyboardLayout,
-					autAgentHost, autAgentPort, startAutCallback);
+			jubulaCliExecutor.startAut(autId, rcpWorkingDir, executableFileName, workspacePath, keyboardLayout, autAgentHost, autAgentPort, startAutCallback);
 
 			// now we should wait until the aut is live, but there's no
 			// indication of it, so... wait for ANOTHER while
@@ -164,22 +163,34 @@ public class JubulaMojo extends AbstractMojo {
 			safeSleep(20000);
 
 			String datadir = ".";
-			String resultsDir = new File(buildDirectory,
-					JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME)
-					.getAbsolutePath();
-			boolean runTests = jubulaCliExecutor.runTests(projectName,
-					projectVersion, workspacePath, databaseUrl, databaseUser,
-					databasePassword, autAgentHost, autAgentPort,
+			String resultsDir = new File(buildDirectory, JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME).getAbsolutePath();
+			boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
 					keyboardLayout, testJob, datadir, resultsDir);
 
 			if (!runTests)
-				getLog().error("There were errors running the tests");
-//				throw new MojoExecutionException(
-//						"There were errors running the tests");
+				throw new MojoExecutionException("There were errors running the tests");
 		} finally {
+			reportResults();
 			jubulaCliExecutor.stopAutAgent();
 		}
 
+	}
+
+	private void reportResults() throws MojoExecutionException {
+		String jubulaResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
+		String surefireResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
+
+		XMLJubulaParser jubulaParser = new XMLJubulaParser();
+		XMLSurefireGenerator surefireGenerator = new XMLSurefireGenerator(surefireResultsFolder);
+
+		try {
+			List<TestSuiteResult> testSuites = jubulaParser.generateSuitesFromFolder(jubulaResultsFolder);
+			surefireGenerator.generateXML(testSuites);
+		} catch (XMLJubulaParserException e) {
+			throw new MojoExecutionException("There was a problem parsing the Jubula results", e);
+		} catch (XMLSurefireGeneratorException e) {
+			throw new MojoExecutionException("There was a problem generating the surefire results", e);
+		}
 	}
 
 	private void safeSleep(long millis) {

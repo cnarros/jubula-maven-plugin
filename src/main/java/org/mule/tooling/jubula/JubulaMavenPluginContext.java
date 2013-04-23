@@ -36,6 +36,7 @@ public abstract class JubulaMavenPluginContext {
 				buildDirectory.getAbsolutePath());
 	}
 
+	@Deprecated
 	public static void initializeContext(final File buildDirectory) {
 		JubulaMavenPluginContext.buildDirectory = buildDirectory;
 	}

@@ -1,5 +1,7 @@
 package org.mule.tooling.jubula.xmlgenerator;
 
+import static junitx.framework.FileAssert.assertBinaryEquals;
+
 import java.io.File;
 
 import org.apache.maven.surefire.report.ReporterException;
@@ -11,8 +13,6 @@ import org.mule.tooling.jubula.results.TestResultError;
 import org.mule.tooling.jubula.results.TestResultSkipped;
 import org.mule.tooling.jubula.results.TestResultSuccessful;
 import org.mule.tooling.jubula.results.TestSuiteResult;
-import static junitx.framework.FileAssert.assertBinaryEquals;
-import static junitx.framework.FileAssert.assertEquals;
 
 public class XMLSurefireReporterTest {
 

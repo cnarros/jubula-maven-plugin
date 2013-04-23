@@ -1,10 +1,17 @@
+/**
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.tooling.jubula;
 
 import static org.mule.tooling.jubula.JubulaMavenPluginContext.JUBULA_BOOTSTRAP_VERSION;
 import static org.mule.tooling.jubula.JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME;
 import static org.mule.tooling.jubula.JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
 import static org.mule.tooling.jubula.JubulaMavenPluginContext.initializeContext;
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToJubulaInstallationDirectory;
 import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToJubulaPluginsDirectory;
 import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToServerPluginsDirectory;
 
@@ -12,8 +19,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +28,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.aether.RepositorySystem;
@@ -45,14 +49,6 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	private static final String ORG_ECLIPSE_JUBULA_RC_RCP_1_2_1_201206131127_JAR = "org.eclipse.jubula.rc.rcp_1.2.1.201206131127.jar";
 
-	/**
-	 * 
-	 * Project being built.
-	 * 
-	 * @parameter expression="${project}"
-	 * @required
-	 */
-	private MavenProject project;
 
 	/**
 	 * The entry point to Aether, i.e. the component doing all the work.

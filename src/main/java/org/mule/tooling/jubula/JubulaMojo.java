@@ -172,7 +172,8 @@ public class JubulaMojo extends AbstractMojo {
 					databasePassword, autAgentHost, autAgentPort,
 					keyboardLayout, testJob, datadir, resultsDir);
 
-//			if (!runTests)
+			if (!runTests)
+				getLog().error("There were errors running the tests");
 //				throw new MojoExecutionException(
 //						"There were errors running the tests");
 		} finally {

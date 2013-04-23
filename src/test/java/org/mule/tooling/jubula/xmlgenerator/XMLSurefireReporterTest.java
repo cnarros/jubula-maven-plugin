@@ -21,11 +21,15 @@ public class XMLSurefireReporterTest {
 
 	@Before
 	public void setUp() {
+		// TODO - tidy this up, send test resources to src/test/resources,
+		// acquire them through this.getClass().getClassLoader().getResource(arg0)
+		// generate results in a target folder
+
 		reporter = new XMLSurefireReporter(new File("testFiles" + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME));
 		reporter.setPrintProperties(false);
-		
+
 		testSuite = new TestSuiteResult("TestReporter", "Project Name", 4000L);
-		
+
 		TestCaseResult testCase;
 
 		testCase = new TestCaseResult("TestCase Name1", 11088000L, new TestResultSuccessful());
@@ -33,7 +37,7 @@ public class XMLSurefireReporterTest {
 
 		testCase = new TestCaseResult("TestCase Name2", 3000L, new TestResultError());
 		testSuite.addTestCaseResult(testCase);
-		
+
 		testCase = new TestCaseResult("TestCase Name3", 3000L, new TestResultSkipped());
 		testSuite.addTestCaseResult(testCase);
 	}
@@ -44,7 +48,7 @@ public class XMLSurefireReporterTest {
 		String filespath = "testFiles" + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
 		File actual = new File(filespath + File.separator + "TEST-TestReporter.xml");
 		File expected = new File(filespath + File.separator + "expected" + File.separator + "TEST-TestReporter-expected.xml");
-		
+
 		assertBinaryEquals(expected, actual);
 	}
 

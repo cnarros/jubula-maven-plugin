@@ -9,6 +9,7 @@
 package org.mule.tooling.jubula.results;
 
 import org.apache.maven.surefire.report.ReportEntry;
+import org.apache.maven.surefire.report.SimpleReportEntry;
 import org.mule.tooling.jubula.xmlgenerator.XMLSurefireReporter;
 
 public class TestCaseResult {
@@ -85,7 +86,7 @@ public class TestCaseResult {
 	}
 	
 	private ReportEntry getReportEntry(){
-		return new ReportEntry(this.className,this.name,this.group,"");
+		return new SimpleReportEntry(this.className,this.name);
 	}
 
 	@Override

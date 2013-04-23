@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.ReporterException;
+import org.apache.maven.surefire.report.SimpleReportEntry;
 import org.mule.tooling.jubula.xmlgenerator.XMLSurefireReporter;
 
 public class TestSuiteResult {
@@ -95,7 +96,7 @@ public class TestSuiteResult {
 	}
 	
 	private ReportEntry getReportEntry(){
-		return new ReportEntry("",this.name,this.group,"");
+		return new SimpleReportEntry("",this.name);
 	}
 
 	@Override

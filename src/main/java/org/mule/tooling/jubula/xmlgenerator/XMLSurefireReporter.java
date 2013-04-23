@@ -137,7 +137,7 @@ public class XMLSurefireReporter extends AbstractReporter {
 		long runTime;
 		
 		if(duration == null){
-			runTime = this.endTime - this.startTime;
+			runTime = this.getActualRunTime(report);
 		} else {
 			runTime = duration;
 		}
@@ -205,7 +205,7 @@ public class XMLSurefireReporter extends AbstractReporter {
 		long runTime;
 		
 		if(duration == null){
-			runTime = this.endTime - this.startTime;
+			runTime = this.getActualRunTime(report);
 		} else {
 			runTime = duration;
 		}
@@ -319,5 +319,11 @@ public class XMLSurefireReporter extends AbstractReporter {
 		Double seconds = runTime / MILLIS_PER_SECOND;
         return String.format(Locale.ENGLISH, "%f", seconds);
     }
+
+	@Override
+	public void writeDetailMessage(String arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

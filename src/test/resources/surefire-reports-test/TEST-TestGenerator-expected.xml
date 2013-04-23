@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="4.000000" errors="1" skipped="1" tests="3" name="TestGenerator">
+  <testcase time="3.000000" classname="" name="TestCase Name1"/>
+  <testcase time="3.000000" classname="" name="TestCase Name2">
+    <error/>
+    <system-out>Undefined Error</system-out>
+    <system-err>Undefined Error</system-err>
+  </testcase>
+  <testcase time="3.000000" classname="" name="TestCase Name3">
+    <skipped/>
+  </testcase>
+</testsuite>

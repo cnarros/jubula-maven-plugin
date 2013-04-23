@@ -9,7 +9,6 @@ import java.util.List;
 import org.dom4j.DocumentException;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mule.tooling.jubula.JubulaMavenPluginContext;
 import org.mule.tooling.jubula.results.TestCaseResult;
 import org.mule.tooling.jubula.results.TestResultSkipped;
 import org.mule.tooling.jubula.results.TestResultSuccessful;
@@ -17,15 +16,17 @@ import org.mule.tooling.jubula.results.TestSuiteResult;
 
 public class XMLJubulaParserTest {
 	private static XMLJubulaParser parser;
+	private static String folder;
 	
 	@BeforeClass
 	public static void setUp(){
 		parser = new XMLJubulaParser();
+		folder = XMLJubulaParserTest.class.getClassLoader().getResource("results-jubula-test").getPath();
 	}
 
 	@Test
 	public void generateSuiteTest() throws DocumentException {
-		TestSuiteResult suite = parser.generateSuite(new File("testFiles" + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME + File.separator + "jubulaTestResult1.xml"));
+		TestSuiteResult suite = parser.generateSuite(new File(folder + File.separator + "jubulaTestResult1.xml"));
 		
 		TestSuiteResult suiteExpected = new TestSuiteResult("Sanity Tests", "MuleStudio 1.0", 288000L);
 		
@@ -45,7 +46,7 @@ public class XMLJubulaParserTest {
 	
 	@Test
 	public void generateSuitesTest() throws XMLJubulaParserException {
-		List<TestSuiteResult> suites = parser.generateSuitesFromFolder("testFiles" + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME);
+		List<TestSuiteResult> suites = parser.generateSuitesFromFolder(folder);
 		
 		List<TestSuiteResult> suitesExpected = new ArrayList<TestSuiteResult>();
 		

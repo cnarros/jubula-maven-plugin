@@ -1,11 +1,13 @@
 package org.mule.tooling.jubula.xmlgenerator;
 
+import static junitx.framework.FileAssert.assertBinaryEquals;
+
 import java.io.File;
+import java.net.URL;
 
 import org.apache.maven.surefire.report.ReporterException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mule.tooling.jubula.JubulaMavenPluginContext;
 import org.mule.tooling.jubula.results.TestCaseResult;
 import org.mule.tooling.jubula.results.TestResultError;
 import org.mule.tooling.jubula.results.TestResultSkipped;
@@ -15,10 +17,13 @@ import org.mule.tooling.jubula.results.TestSuiteResult;
 public class XMLSurefireGeneratorTest {
 	private XMLSurefireGenerator generator;
 	private TestSuiteResult testSuite;
+	private File reportFolder;
 	
 	@Before
 	public void setUp() {
-		generator = new XMLSurefireGenerator("testFiles" + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME, false);
+		reportFolder = new File("target" + File.separator + "surefire-reports-test" + File.separator);
+		
+		generator = new XMLSurefireGenerator("target" + File.separator + "surefire-reports-test" + File.separator, false);
 		testSuite = new TestSuiteResult("TestGenerator", "Project Name", 4000L);
 		
 		TestCaseResult testCase;
@@ -35,7 +40,15 @@ public class XMLSurefireGeneratorTest {
 	
 	@Test
 	public void testGenerator() throws ReporterException, XMLSurefireGeneratorException {
-		generator.generateXML(testSuite);
+		generator. generateXML(testSuite);
+		
+		File actual = new File(reportFolder.getPath() + File.separator + "TEST-TestGenerator.xml");
+		
+		URL fileURL = this.getClass().getClassLoader().getResource("surefire-reports-test" + File.separator + "TEST-TestGenerator-expected.xml");
+		
+		File expected = new File(fileURL.getPath());
+
+		assertBinaryEquals(expected, actual);
 	}
 
 }

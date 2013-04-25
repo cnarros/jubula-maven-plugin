@@ -10,22 +10,38 @@ Run [Jubula Functional Tests](http://www.eclipse.org/jubula/) in a Maven build. 
 Add the following snippet inside build -> plugins:
 
 ```xml
-<plugin>
-    <groupId>org.mule.tooling</groupId>
-    <artifactId>jubula-maven-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <executions>
-        <execution>
-            <phase>integration-tests</phase>
-            <goals>
-                <goal>test</goal>
-            </goals>
-            <configuration>
-                <product>org.mule.tooling:my-product:3.2.1</product>
-            </configuration>
-        </execution>
-    </executions>
-</plugin>
+    		<plugin>
+				<groupId>org.mule.tooling</groupId>
+				<artifactId>jubula-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare</goal>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<rcpTargetDirectory>${basedir}/target/MyRCP</rcpTargetDirectory>
+                    <executableFileName>MyRCP.exe</executableFileName>
+					<jubulaPlugins>
+						<dependency>
+							<groupId>org.mule.tooling</groupId>
+							<artifactId>jubula-accessibility-plugin</artifactId>
+							<version>1.0-SNAPSHOT</version>
+						</dependency>
+					</jubulaPlugins>
+					<autId>${jubula.autid}</autId>
+					<rcpWorkingDir>${basedir}/target/MyRCP</rcpWorkingDir>
+					<projectName>MyRCPApplication</projectName>
+					<projectVersion>1.0</projectVersion>
+					<databaseUrl>jdbc:mysql://${db.url}/jubula</databaseUrl>
+					<databaseUser>${db.username}</databaseUser>
+					<databasePassword>${db.password}</databasePassword>
+					<testJob>${job}</testJob>
+				</configuration>
+			</plugin>
 ```
 
 # Authors

@@ -26,7 +26,7 @@ public class XMLSurefireReporterTest {
 		// acquire them through this.getClass().getClassLoader().getResource(arg0)
 		// generate results in a target folder
 		
-		reportFolder = new File("target" + File.separator + "surefire-reports-test" + File.separator);
+		reportFolder = new File("target", "surefire-reports-test");
 		
 		reporter = new XMLSurefireReporter(reportFolder);
 		reporter.setPrintProperties(false);
@@ -49,9 +49,9 @@ public class XMLSurefireReporterTest {
 	public void testReporter() throws ReporterException {
 		testSuite.report(reporter);
 
-		File actual = new File(reportFolder.getPath() + File.separator + "TEST-TestReporter.xml");
+		File actual = new File(reportFolder.getPath(), "TEST-TestReporter.xml");
 		
-		URL fileURL = this.getClass().getClassLoader().getResource("surefire-reports-test" + File.separator + "TEST-TestReporter-expected.xml");
+		URL fileURL = this.getClass().getClassLoader().getResource("surefire-reports-test/TEST-TestReporter-expected.xml");
 		
 		File expected = new File(fileURL.getPath());
 

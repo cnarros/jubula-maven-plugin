@@ -44,7 +44,7 @@ public class XMLSurefireGeneratorTest {
 		
 		File actual = new File(reportFolder.getPath() + File.separator + "TEST-TestGenerator.xml");
 		
-		URL fileURL = this.getClass().getClassLoader().getResource("surefire-reports-test" + File.separator + "TEST-TestGenerator-expected.xml");
+		URL fileURL = this.getClass().getClassLoader().getResource("surefire-reports-test/TEST-TestGenerator-expected.xml");
 		
 		File expected = new File(fileURL.getPath());
 

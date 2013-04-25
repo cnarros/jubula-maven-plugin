@@ -76,6 +76,9 @@
 					<postBuildHookScript>verify</postBuildHookScript>
 					<projectsDirectory>src/it</projectsDirectory>
 					<settingsFile>src/it/settings.xml</settingsFile>
+					<pomExcludes>
+						<pomExclude>**/basicResult/pom.xml</pomExclude>
+					</pomExcludes>
 				</configuration>
 				<executions>
 					<execution>

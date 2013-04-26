@@ -44,6 +44,8 @@
 				<configuration>
 					<header>LICENSE_HEADER.txt</header>
 					<excludes>
+						<!-- exclusion for bamboo file -->
+						<exclude>build-number.txt</exclude>
 						<exclude>src/test/**</exclude>
 						<exclude>target/**</exclude>
 						<exclude>.gitignore</exclude>

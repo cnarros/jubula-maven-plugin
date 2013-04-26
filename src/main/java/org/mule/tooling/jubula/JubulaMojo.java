@@ -31,7 +31,7 @@ import org.mule.tooling.jubula.xmlparser.XMLJubulaParserException;
 public class JubulaMojo extends AbstractMojo {
 
 	/**
-	 * Where the .js files will be located for running.
+	 * Project's target folder.
 	 * 
 	 * @parameter expression="${project.build.directory}"
 	 * @readonly
@@ -66,7 +66,7 @@ public class JubulaMojo extends AbstractMojo {
 	/**
 	 * The keyboard layout
 	 * 
-	 * @parameter default-value="EN_US"
+	 * @parameter default-value="en_US"
 	 * @required
 	 */
 	private String keyboardLayout;
@@ -165,7 +165,7 @@ public class JubulaMojo extends AbstractMojo {
 			String datadir = ".";
 			String resultsDir = new File(buildDirectory, JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME).getAbsolutePath();
 			boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
-					keyboardLayout, testJob, datadir, resultsDir);
+					keyboardLayout.toUpperCase(), testJob, datadir, resultsDir);
 
 			if (!runTests)
 				throw new MojoExecutionException("There were errors running the tests");

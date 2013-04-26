@@ -70,8 +70,8 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	private RepositorySystemSession repoSession;
 
 	/**
-	 * The project's remote repositories to use for the resolution of plugins
-	 * and their dependencies.
+	 * The project's remote repositories to use for the resolution of
+	 * dependencies.
 	 * 
 	 * @parameter default-value="${project.remoteArtifactRepositories}"
 	 * @readonly
@@ -96,9 +96,22 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	private String rcpTargetDirectory;
 
 	/**
+	 * A list of plugins (intended for jubula accessibility plugins) to install
+	 * into the RCP being tested. These dependencies should resolve to jar files
+	 * that are copied into the plugins folder of the RCP.
+	 * 
 	 * @parameter
 	 */
-	private List<Dependency> jubulaPlugins;
+	private List<AdditionalPlugin> additionalPlugins;
+
+	/**
+	 * An artifact that provides a jubula-bootstrap zip packaging. If none
+	 * provided, it will default to the tooling implementation
+	 * (org.mule.tooling:jubula-bootstrap:<version>)
+	 * 
+	 * @parameter
+	 */
+	private JubulaBootstrapArtifact jubulaBootstrap;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -172,25 +185,21 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	}
 
 	protected List<Dependency> getAllPlugins() {
-		final ArrayList<Dependency> allPlugins = new ArrayList<Dependency>(jubulaPlugins);
+		final ArrayList<Dependency> allPlugins = new ArrayList<Dependency>(additionalPlugins);
 		// TODO - Someone should upload this dependency to Maven or at least
 		// copy it to bootstrap distribution. - miguel
 		// allPlugins.add(remoteControlDependency());
 		return allPlugins;
 	}
 
-	@SuppressWarnings("unused")
-	private Dependency getRemoteControlDependency() {
-		// TODO initialize dependency bean
-		return createDependency("", "", "", "");
-	}
-
 	private Dependency getJubulaBootsrapDependency() {
-		return createDependency( //
-				"org.mule.tooling", //
-				"jubula-bootstrap", //
-				JUBULA_BOOTSTRAP_VERSION, //
-				"zip");
+		Dependency dependency;
+		if (jubulaBootstrap != null) {
+			dependency = jubulaBootstrap;
+		} else {
+			dependency = createDependency("org.mule.tooling", "jubula-bootstrap", JUBULA_BOOTSTRAP_VERSION, "zip");
+		}
+		return dependency;
 	}
 
 	protected Dependency createDependency(final String groupId, final String artifactId, final String version, final String type) {

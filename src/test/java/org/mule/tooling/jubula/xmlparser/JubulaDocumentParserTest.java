@@ -25,11 +25,6 @@ public class JubulaDocumentParserTest {
 	}
 
 	@Test
-	public void getNameOfTest() throws Exception {
-		assertEquals("Create Project via Menu (projectName=loremipsum)", parser.getTestName());
-	}
-
-	@Test
 	public void getSuiteNameTest() throws Exception {
 		assertEquals("Sanity Tests", parser.getTestSuitName());
 	}
@@ -46,7 +41,7 @@ public class JubulaDocumentParserTest {
 
 	@Test
 	public void getResultByNumberTest() throws Exception {
-		assertEquals("Create Project via Menu (projectName=loremipsum)", parser.getTestNameByID(1));
+		assertEquals("Create Project via Menu (projectName: loremipsum)", parser.getTestNameByID(1));
 	}
 
 	@Test

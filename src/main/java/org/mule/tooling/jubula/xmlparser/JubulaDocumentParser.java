@@ -19,37 +19,31 @@ import org.dom4j.Node;
 
 public class JubulaDocumentParser {
 	private Document document;
-	
-	public JubulaDocumentParser(Document document){
-		if(document == null){
+
+	public JubulaDocumentParser(Document document) {
+		if (document == null) {
 			throw new IllegalArgumentException();
 		}
 		this.document = document;
 	}
-	
+
 	public List<Node> getListOfResults() {
 		@SuppressWarnings("unchecked")
 		List<Node> nodes = document.selectNodes("//testsuite/test-run/testcase");
 		return nodes;
 	}
-	
-	public String getTestName() {
-		Node node = document.selectSingleNode("//testsuite/test-run/testcase/name");
-		Node nodeAtribute = document.selectSingleNode("//testsuite/test-run/testcase/parameter/parameter-value");
-
-		return node.getStringValue() + " (projectName=" + nodeAtribute.getStringValue() + ")";
-	}
 
 	public String getTestNameByID(int secuencialID) {
-		Node node = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/name");
-		Node nodeAtribute = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/parameter/parameter-value");
+		Node testcaseNameNode = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/name");
+		Node paramterNameNode = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/parameter/parameter-name");
+		Node paramterValueNode = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/parameter/parameter-value");
 
 		String name = "Not Provided";
-		
-		if(node != null){
-			name = node.getStringValue();
-			if (nodeAtribute != null) {
-				name += " (projectName=" + nodeAtribute.getStringValue() + ")";
+
+		if (testcaseNameNode != null) {
+			name = testcaseNameNode.getStringValue();
+			if (paramterValueNode != null) {
+				name += " (" + paramterNameNode.getStringValue() + ": " + paramterValueNode.getStringValue() + ")";
 			}
 		}
 
@@ -79,7 +73,7 @@ public class JubulaDocumentParser {
 			return 0;
 		}
 	}
-	
+
 	public String getTestResultById(int secuencialID) {
 		Node node = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/status");
 
@@ -88,7 +82,7 @@ public class JubulaDocumentParser {
 		}
 		return "2";
 	}
-	
+
 	public long getTestTestDurationById(int secuencialID) {
 		Node node = document.selectSingleNode("//testsuite/test-run/testcase[" + secuencialID + "]/@duration");
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
@@ -109,5 +103,5 @@ public class JubulaDocumentParser {
 		}
 
 	}
-	
+
 }

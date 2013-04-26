@@ -32,10 +32,10 @@ public class XMLJubulaParserTest {
 		
 		TestCaseResult testCase;
 
-		testCase = new TestCaseResult("Create Project via Menu (projectName=loremipsum)", 41000L, new TestResultSuccessful());
+		testCase = new TestCaseResult("Create Project via Menu (projectName: loremipsum)", 41000L, new TestResultSuccessful());
 		suiteExpected.addTestCaseResult(testCase);
 
-		testCase = new TestCaseResult("Basic Usage (projectName=basicusage)", 51000L, new TestResultSuccessful());
+		testCase = new TestCaseResult("Basic Usage (projectName: basicusage)", 51000L, new TestResultSuccessful());
 		suiteExpected.addTestCaseResult(testCase);
 		
 		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());
@@ -55,10 +55,10 @@ public class XMLJubulaParserTest {
 		
 		suiteExpected = new TestSuiteResult("Sanity Tests", "MuleStudio 1.0", 288000L);
 
-		testCase = new TestCaseResult("Create Project via Menu (projectName=loremipsum)", 41000L, new TestResultSuccessful());
+		testCase = new TestCaseResult("Create Project via Menu (projectName: loremipsum)", 41000L, new TestResultSuccessful());
 		suiteExpected.addTestCaseResult(testCase);
 
-		testCase = new TestCaseResult("Basic Usage (projectName=basicusage)", 51000L, new TestResultSuccessful());
+		testCase = new TestCaseResult("Basic Usage (projectName: basicusage)", 51000L, new TestResultSuccessful());
 		suiteExpected.addTestCaseResult(testCase);
 		
 		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());
@@ -68,10 +68,10 @@ public class XMLJubulaParserTest {
 		
 		suiteExpected = new TestSuiteResult("Sanity Tests 2", "MuleStudio 1.0", 288000L);
 
-		testCase = new TestCaseResult("Create Project via Menu (projectName=loremipsum)", 41000L, new TestResultSuccessful());
+		testCase = new TestCaseResult("Create Project via Menu (projectName: loremipsum)", 41000L, new TestResultSuccessful());
 		suiteExpected.addTestCaseResult(testCase);
 
-		testCase = new TestCaseResult("Basic Usage (projectName=basicusage)", 51000L, new TestResultSuccessful());
+		testCase = new TestCaseResult("Basic Usage (projectName: basicusage)", 51000L, new TestResultSuccessful());
 		suiteExpected.addTestCaseResult(testCase);
 		
 		testCase = new TestCaseResult("Create Templates", 0L, new TestResultSkipped());

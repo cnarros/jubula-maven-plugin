@@ -23,6 +23,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.util.FileUtils;
+import org.mule.tooling.jubula.utils.MavenDependencyUtils;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
@@ -72,7 +73,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	private List<MavenArtifactRepository> remoteRepos;
 
 	/**
-	 * Where the .js files will be located for running.
+	 * Project's target folder.
 	 * 
 	 * @parameter expression="${project.build.directory}"
 	 * @readonly
@@ -90,7 +91,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	/**
 	 * A list of plugins (intended for jubula accessibility plugins) to install
-	 * into the RCP being tested. These dependencies should resolve to jar files
+	 * into the RCP app being tested. These dependencies should resolve to jar files
 	 * that are copied into the plugins folder of the RCP.
 	 * 
 	 * @parameter
@@ -98,7 +99,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	private List<AdditionalPlugin> additionalPlugins;
 
 	/**
-	 * An artifact that provides a jubula-bootstrap zip packaging. If none
+	 * An artifact that provides a jubula-bootstrap zip package. If none
 	 * provided, it will default to the tooling implementation
 	 * (org.mule.tooling:jubula-bootstrap:<version>)
 	 * 
@@ -108,17 +109,21 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		getLog().info("Prepare Jubula Mojo starting");
-
 		createTestWorkingDirectories();
 		prepareJubulaInstallation();
 		copyUserDefinedPluginsToRcp();
 	}
 
 	private void prepareJubulaInstallation() throws MojoExecutionException {
-		final File jubula = fetchArtifact(getJubulaBootsrapDependency());
+		Dependency jubulaBootsrapDependency = getJubulaBootsrapDependency();
+
+		getLog().info("Preparing Jubula installation, using artifact: " + MavenDependencyUtils.toString(jubulaBootsrapDependency));
+		final File jubula = fetchArtifact(jubulaBootsrapDependency);
+
+		getLog().info("Extracting Jubula installation");
 		extract(jubula, buildDirectory);
 
+		getLog().info("Jubula expanded, now copying redundant plugins");
 		copyServerJubulaPluginsToJubulaPlugins();
 	}
 
@@ -129,12 +134,16 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	private void copyServerJubulaPluginsToJubulaPlugins() throws MojoExecutionException {
 		try {
+			String pathToServerPluginsDirectory = JubulaBootstrapUtils.pathToServerPluginsDirectory(buildDirectory);
+			String pathToJubulaPluginsDirectory = JubulaBootstrapUtils.pathToJubulaPluginsDirectory(buildDirectory);
+			getLog().info("Copying everything from " + pathToServerPluginsDirectory + " to " + pathToJubulaPluginsDirectory);
+
 			FileUtils.copyDirectory( //
-					new File(JubulaBootstrapUtils.pathToServerPluginsDirectory(buildDirectory)), //
-					new File(JubulaBootstrapUtils.pathToJubulaPluginsDirectory(buildDirectory)));
+					new File(pathToServerPluginsDirectory), //
+					new File(pathToJubulaPluginsDirectory));
 
 		} catch (final IOException e) {
-			throw new MojoExecutionException("Error copying plugins. Verify that the RCP target directory is correct.", e);
+			throw new MojoExecutionException("Error copying jubula plugins. Verify that the Jubula bootstrap provided is well-formed.", e);
 		}
 	}
 
@@ -145,11 +154,19 @@ public class JubulaPrepareMojo extends AbstractMojo {
 			// TODO - Until the RC is uploaded to Maven or shipped with Jubula
 			// bootstrap, we are incluiding it here - miguel
 			final File out = new File(pluginsDirectory, BUNDLED_JUBULA_RC_PLUGIN_FILENAME);
+			getLog().info("Copying RC plugin (" + BUNDLED_JUBULA_RC_PLUGIN_FILENAME + ") to " + out.getAbsolutePath());
 			IOUtils.copy(getRemoteControlArtifactStream(), new FileOutputStream(out));
 
-			for (final File artifact : fetchArtifacts()) {
-				FileUtils.copyFileToDirectory(artifact, pluginsDirectory);
-				getLog().info("Wrote artifact " + artifact.getAbsolutePath() + " to plugins directory");
+			if (additionalPlugins.size() > 0) {
+				for (final Dependency additionalPlugin : additionalPlugins) {
+					getLog().info("Fetching additional plugin for RCP app: " + MavenDependencyUtils.toString(additionalPlugin));
+					File artifact = fetchArtifact(additionalPlugin);
+					getLog().info("Copying " + artifact.getName() + " to " + pluginsDirectory.getAbsolutePath());
+					FileUtils.copyFileToDirectory(artifact, pluginsDirectory);
+				}
+				getLog().info("Finished copying additional plugins to RCP app");
+			} else {
+				getLog().info("No additional plugins to copy to RCP app");
 			}
 
 		} catch (final IOException e) {
@@ -159,26 +176,6 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 	protected InputStream getRemoteControlArtifactStream() {
 		return getClass().getClassLoader().getResourceAsStream(BUNDLED_JUBULA_RC_PLUGIN_FILENAME);
-	}
-
-	private List<File> fetchArtifacts() throws MojoExecutionException {
-		final List<Dependency> allPlugins = getAllPlugins();
-
-		final List<File> artifacts = new ArrayList<File>(allPlugins.size());
-		for (final Dependency dependency : allPlugins) {
-			final File file = fetchArtifact(dependency);
-			artifacts.add(file);
-		}
-
-		return artifacts;
-	}
-
-	protected List<Dependency> getAllPlugins() {
-		final ArrayList<Dependency> allPlugins = new ArrayList<Dependency>(additionalPlugins);
-		// TODO - Someone should upload this dependency to Maven or at least
-		// copy it to bootstrap distribution. - miguel
-		// allPlugins.add(remoteControlDependency());
-		return allPlugins;
 	}
 
 	private Dependency getJubulaBootsrapDependency() {
@@ -209,18 +206,19 @@ public class JubulaPrepareMojo extends AbstractMojo {
 
 		request.setRepositories(aetherRepos);
 
-		getLog().info("Resolving artifact " + dependency + " from " + aetherRepos);
+		getLog().debug("Resolving artifact " + dependency + " from " + aetherRepos);
 
 		ArtifactResult result;
 		try {
 			result = repoSystem.resolveArtifact(repoSession, request);
 		} catch (final ArtifactResolutionException e) {
+			getLog().error("There was a problem fetching artifact: " + MavenDependencyUtils.toString(dependency));
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 
 		final Artifact artifact = result.getArtifact();
 
-		getLog().info("Resolved artifact " + artifact + " to " + result.getArtifact().getFile() + " from " + result.getRepository());
+		getLog().debug("Resolved artifact " + artifact + " to " + result.getArtifact().getFile() + " from " + result.getRepository());
 
 		return artifact.getFile();
 	}
@@ -251,12 +249,13 @@ public class JubulaPrepareMojo extends AbstractMojo {
 		zipUnArchiver.enableLogging(new org.codehaus.plexus.logging.console.ConsoleLogger(0, "Unzipping"));
 
 		zipUnArchiver.setDestDirectory(extractDirectory);
+		getLog().info("Extracting " + file.getName() + " into " + extractDirectory.getAbsolutePath());
 		zipUnArchiver.extract();
 	}
 
 	protected void createFile(final String fileToBeCreatedName) {
 		final File fileToBeCreated = new File(buildDirectory, fileToBeCreatedName);
-
+		getLog().info("Preparing directory: " + fileToBeCreatedName);
 		createFile(fileToBeCreated);
 	}
 

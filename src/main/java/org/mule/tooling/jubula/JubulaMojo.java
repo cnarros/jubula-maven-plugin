@@ -133,13 +133,7 @@ public class JubulaMojo extends AbstractMojo {
 		String jubulaInstallationPath = JubulaBootstrapUtils.pathToJubulaInstallationDirectory(buildDirectory);
 		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
 
-		SyncCallback startAutAgentCallback = new SyncCallback();
-		// start the aut agent
-		jubulaCliExecutor.startAutAgent(startAutAgentCallback);
-
-		// now we should wait until the aut agent is live, but there's no
-		// indication of it, so... wait for a while
-		safeSleep(5000);
+		startAutAgent(jubulaCliExecutor);
 
 		String workspacePath = new File(buildDirectory, JubulaBootstrapUtils.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
 
@@ -171,6 +165,16 @@ public class JubulaMojo extends AbstractMojo {
 			jubulaCliExecutor.stopAutAgent();
 		}
 
+	}
+
+	private void startAutAgent(JubulaCliExecutor jubulaCliExecutor) {
+		SyncCallback startAutAgentCallback = new SyncCallback();
+		// start the aut agent
+		jubulaCliExecutor.startAutAgent(startAutAgentCallback);
+
+		// now we should wait until the aut agent is live, but there's no
+		// indication of it, so... wait for a while
+		safeSleep(5000);
 	}
 
 	private void reportResults() throws MojoExecutionException {

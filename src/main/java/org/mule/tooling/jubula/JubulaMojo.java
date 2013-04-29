@@ -130,10 +130,7 @@ public class JubulaMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		// TODO - get rid of this static initialization, refactor JubulaMavenPluginContext
-		JubulaMavenPluginContext.initializeContext(buildDirectory);
-
-		String jubulaInstallationPath = JubulaMavenPluginContext.pathToJubulaInstallationDirectory();
+		String jubulaInstallationPath = JubulaBootstrapUtils.pathToJubulaInstallationDirectory(buildDirectory);
 		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
 
 		SyncCallback startAutAgentCallback = new SyncCallback();
@@ -144,7 +141,7 @@ public class JubulaMojo extends AbstractMojo {
 		// indication of it, so... wait for a while
 		safeSleep(5000);
 
-		String workspacePath = new File(buildDirectory, JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
+		String workspacePath = new File(buildDirectory, JubulaBootstrapUtils.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
 
 		SyncCallback startAutCallback = new SyncCallback();
 		String[] hostAndPort = autAgentAddress.split(":");
@@ -163,7 +160,7 @@ public class JubulaMojo extends AbstractMojo {
 			safeSleep(20000);
 
 			String datadir = ".";
-			String resultsDir = new File(buildDirectory, JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME).getAbsolutePath();
+			String resultsDir = new File(buildDirectory, JubulaBootstrapUtils.RESULTS_DIRECTORY_NAME).getAbsolutePath();
 			boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
 					keyboardLayout.toUpperCase(), testJob, datadir, resultsDir);
 
@@ -177,8 +174,8 @@ public class JubulaMojo extends AbstractMojo {
 	}
 
 	private void reportResults() throws MojoExecutionException {
-		String jubulaResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
-		String surefireResultsFolder = buildDirectory + File.separator + JubulaMavenPluginContext.SUREFIRE_RESULTS_DIRECTORY_NAME;
+		String jubulaResultsFolder = buildDirectory + File.separator + JubulaBootstrapUtils.RESULTS_DIRECTORY_NAME;
+		String surefireResultsFolder = buildDirectory + File.separator + JubulaBootstrapUtils.SUREFIRE_RESULTS_DIRECTORY_NAME;
 
 		XMLJubulaParser jubulaParser = new XMLJubulaParser();
 		XMLSurefireGenerator surefireGenerator = new XMLSurefireGenerator(surefireResultsFolder);

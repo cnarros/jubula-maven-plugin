@@ -8,13 +8,6 @@
 
 package org.mule.tooling.jubula;
 
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.JUBULA_BOOTSTRAP_VERSION;
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.RCPWORKSPACE_DIRECTORY_NAME;
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.RESULTS_DIRECTORY_NAME;
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.initializeContext;
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToJubulaPluginsDirectory;
-import static org.mule.tooling.jubula.JubulaMavenPluginContext.pathToServerPluginsDirectory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -117,10 +110,6 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("Prepare Jubula Mojo starting");
 
-		// TODO - get rid of this static initialization, refactor
-		// JubulaMavenPluginContext
-		initializeContext(buildDirectory);
-
 		createTestWorkingDirectories();
 		prepareJubulaInstallation();
 		copyUserDefinedPluginsToRcp();
@@ -134,15 +123,15 @@ public class JubulaPrepareMojo extends AbstractMojo {
 	}
 
 	private void createTestWorkingDirectories() {
-		createFile(RCPWORKSPACE_DIRECTORY_NAME);
-		createFile(RESULTS_DIRECTORY_NAME);
+		createFile(JubulaBootstrapUtils.RCPWORKSPACE_DIRECTORY_NAME);
+		createFile(JubulaBootstrapUtils.RESULTS_DIRECTORY_NAME);
 	}
 
 	private void copyServerJubulaPluginsToJubulaPlugins() throws MojoExecutionException {
 		try {
 			FileUtils.copyDirectory( //
-					new File(pathToServerPluginsDirectory()), //
-					new File(pathToJubulaPluginsDirectory()));
+					new File(JubulaBootstrapUtils.pathToServerPluginsDirectory(buildDirectory)), //
+					new File(JubulaBootstrapUtils.pathToJubulaPluginsDirectory(buildDirectory)));
 
 		} catch (final IOException e) {
 			throw new MojoExecutionException("Error copying plugins. Verify that the RCP target directory is correct.", e);
@@ -197,7 +186,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 		if (jubulaBootstrap != null) {
 			dependency = jubulaBootstrap;
 		} else {
-			dependency = createDependency("org.mule.tooling", "jubula-bootstrap", JUBULA_BOOTSTRAP_VERSION, "zip");
+			dependency = createDependency("org.mule.tooling", "jubula-bootstrap", JubulaBootstrapUtils.JUBULA_BOOTSTRAP_VERSION, "zip");
 		}
 		return dependency;
 	}

@@ -128,36 +128,60 @@ public class JubulaMojo extends AbstractMojo {
 	 */
 	private String testJob;
 
+	/**
+	 * Path to external test data directory
+	 * 
+	 * @parameter default-value="."
+	 */
+	private String datadir;
+
+	/**
+	 * Amount of milliseconds to wait for the AUT to be considered as started
+	 * 
+	 * @parameter default-value="20000"
+	 */
+	private int delayAfterAutStart;
+
+	/**
+	 * Amount of milliseconds to wait for the AUT agent to be considered as
+	 * started (this exists because autagent and startaut share the same config
+	 * area and if there is not some amount of waiting between the starting of
+	 * those two programs, some file locking might get in the way)
+	 * 
+	 * @parameter default-value="5000"
+	 */
+	private int delayAfterAutAgentStart;
+
 	@Override
 	public void execute() throws MojoExecutionException {
+		validateParameters();
+
 		String jubulaInstallationPath = JubulaBootstrapUtils.pathToJubulaInstallationDirectory(buildDirectory);
-		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
-
-		startAutAgent(jubulaCliExecutor);
-
+		String resultsDir = new File(buildDirectory, JubulaBootstrapUtils.RESULTS_DIRECTORY_NAME).getAbsolutePath();
 		String workspacePath = new File(buildDirectory, JubulaBootstrapUtils.RCPWORKSPACE_DIRECTORY_NAME).getAbsolutePath();
-
+		String autAgentHost = autAgentAddress.split(":")[0];
+		String autAgentPort = autAgentAddress.split(":")[1];
+		JubulaCliExecutor jubulaCliExecutor = new JubulaCliExecutorFactory().getNewInstance(jubulaInstallationPath);
+		SyncCallback startAutAgentCallback = new SyncCallback();
 		SyncCallback startAutCallback = new SyncCallback();
-		String[] hostAndPort = autAgentAddress.split(":");
-		if (hostAndPort.length != 2)
-			throw new MojoExecutionException("Please provide the AUT Agent address as <host>:<port>");
 
-		String autAgentHost = hostAndPort[0];
-		String autAgentPort = hostAndPort[1];
+		// start the aut agent
+		this.getLog().info("Starting AUT Agent...");
+		jubulaCliExecutor.startAutAgent(startAutAgentCallback);
+		this.safeSleep(this.delayAfterAutAgentStart);
 
 		try {
+			getLog().info("Starting AUT...");
 			jubulaCliExecutor.startAut(autId, rcpWorkingDir, executableFileName, workspacePath, keyboardLayout, autAgentHost, autAgentPort, startAutCallback);
 
-			// now we should wait until the aut is live, but there's no
-			// indication of it, so... wait for ANOTHER while
-			// TODO - maybe make this configurable by parameter
-			safeSleep(20000);
+			safeSleep(delayAfterAutStart);
+			getLog().debug("Considered AUT as fully initialized");
 
-			String datadir = ".";
-			String resultsDir = new File(buildDirectory, JubulaBootstrapUtils.RESULTS_DIRECTORY_NAME).getAbsolutePath();
+			getLog().info("Connect to database and start running tests...");
 			boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
 					keyboardLayout.toUpperCase(), testJob, datadir, resultsDir);
 
+			getLog().info("Finished running tests");
 			if (!runTests)
 				throw new MojoExecutionException("There were errors running the tests");
 		} finally {
@@ -167,14 +191,10 @@ public class JubulaMojo extends AbstractMojo {
 
 	}
 
-	private void startAutAgent(JubulaCliExecutor jubulaCliExecutor) {
-		SyncCallback startAutAgentCallback = new SyncCallback();
-		// start the aut agent
-		jubulaCliExecutor.startAutAgent(startAutAgentCallback);
-
-		// now we should wait until the aut agent is live, but there's no
-		// indication of it, so... wait for a while
-		safeSleep(5000);
+	private void validateParameters() throws MojoExecutionException {
+		String[] hostAndPort = autAgentAddress.split(":");
+		if (hostAndPort.length != 2)
+			throw new MojoExecutionException("Please provide the AUT Agent address as <host>:<port>");
 	}
 
 	private void reportResults() throws MojoExecutionException {
@@ -185,7 +205,9 @@ public class JubulaMojo extends AbstractMojo {
 		XMLSurefireGenerator surefireGenerator = new XMLSurefireGenerator(surefireResultsFolder);
 
 		try {
+			getLog().debug("Reading surefire reports from Jubula results files...");
 			List<TestSuiteResult> testSuites = jubulaParser.generateSuitesFromFolder(jubulaResultsFolder);
+			getLog().debug("Writing surefire reports from Jubula results files...");
 			surefireGenerator.generateXML(testSuites);
 		} catch (XMLJubulaParserException e) {
 			throw new MojoExecutionException("There was a problem parsing the Jubula results", e);

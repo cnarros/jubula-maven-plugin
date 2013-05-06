@@ -157,7 +157,7 @@ public class JubulaPrepareMojo extends AbstractMojo {
 			getLog().info("Copying RC plugin (" + BUNDLED_JUBULA_RC_PLUGIN_FILENAME + ") to " + out.getAbsolutePath());
 			IOUtils.copy(getRemoteControlArtifactStream(), new FileOutputStream(out));
 
-			if (additionalPlugins.size() > 0) {
+			if (additionalPlugins != null && additionalPlugins.size() > 0) {
 				for (final Dependency additionalPlugin : additionalPlugins) {
 					getLog().info("Fetching additional plugin for RCP app: " + MavenDependencyUtils.toString(additionalPlugin));
 					File artifact = fetchArtifact(additionalPlugin);

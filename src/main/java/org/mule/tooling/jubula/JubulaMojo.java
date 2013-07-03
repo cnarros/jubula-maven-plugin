@@ -178,7 +178,7 @@ public class JubulaMojo extends AbstractMojo {
 			getLog().debug("Considered AUT as fully initialized");
 
 			getLog().info("Connect to database and start running tests...");
-			boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, workspacePath, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
+			boolean runTests = jubulaCliExecutor.runTests(projectName, projectVersion, autId, databaseUrl, databaseUser, databasePassword, autAgentHost, autAgentPort,
 					keyboardLayout.toUpperCase(), testJob, datadir, resultsDir);
 
 			getLog().info("Finished running tests");
